@@ -98,8 +98,8 @@ class Duck {
         spriteSheetY,
         this.spriteWidth,
         this.spriteHeight,
-        this.x,
-        this.y,
+        0,
+        0,
         duckWidth,
         duckHeight
       );
