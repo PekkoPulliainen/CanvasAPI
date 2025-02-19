@@ -1,25 +1,36 @@
 let lastMouseX;
 let lastMouseY;
-let duckWidth = 250;
-let duckHeight = 250;
+let duckWidth = 120;
+let duckHeight = 110;
 
 let canvas = document.getElementById("gameCanvas");
 let context = canvas.getContext("2d");
 
-let duckes = [];
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
 
-const laukaus = new Audio("./CANVASAPI_UI/laukaus.mp3");
-laukaus.volume = 0.3;
+window.addEventListener("resize", resizeCanvas);
+resizeCanvas();
+
+let sheetWidth = 644;
+let sheetHeight = 294;
+
+let ducks = [];
+const background = new Image();
+background.src = "./CANVASAPI_UI/background-update.png";
+
+const spriteSheet = new Image();
+spriteSheet.src = "./CANVASAPI_UI/sprites-remake.png";
+
+canvas.style.backgroundColor = "rgb(88, 159, 241)";
+
+const bulletAudio = new Audio("./CANVASAPI_UI/laukaus.mp3");
+bulletAudio.volume = 0.05;
 
 window.onload = () => {
   let scoreCount = 0;
-  let scoreLabel = document.getElementById("scoreLabel");
-  scoreLabel.innerText = scoreCount;
-
-  // Esimerkki
-  const ankkagif = new Image();
-  ankkagif.src = "./CANVASAPI_UI/ankka.gif";
-  //
 
   let duckX = 750;
   let duckY = 300;
@@ -27,11 +38,6 @@ window.onload = () => {
   let duckHeight = 100;
 
   let duckClick = false;
-
-  ankkagif.onload = function () {
-    if (!duckClick)
-      context.drawImage(ankkagif, duckX, duckY, duckWidth, duckHeight);
-  };
 
   canvas.addEventListener("click", (event) => {
     let rect = canvas.getBoundingClientRect();
@@ -45,24 +51,23 @@ window.onload = () => {
       isDuckClicked(x, y, duckX, duckY, duckWidth, duckHeight)
     ) {
       scoreCount += 100;
-      scoreLabel.innerText = scoreCount;
       context.clearRect(duckX, duckY, duckWidth, duckHeight);
       duckClick = true;
-      laukaus.currentTime = 0;
-      laukaus.play();
+      bulletAudio.currentTime = 0;
+      bulletAudio.play();
     }
   });
-  for (var i = 0; i < 4; i++) {
-    var x = Math.random() * window.innerWidth;
-    var y = Math.random() * window.innerHeight;
-    var duck = new Duck(x, y, 1);
-    duckes.push(duck);
+  for (let i = 0; i < 4; i++) {
+    let x = Math.random() * window.innerWidth;
+    let y = Math.random() * window.innerHeight;
+    let duck = new Duck(x, y, 1);
+    ducks.push(duck);
   }
-  updateDuckes();
+  animateFrame();
 };
 
 function isDuckClicked(x, y, duckX, duckY, duckWidth, duckHeight) {
-  laukaus.play();
+  bulletAudio.play();
   return (
     x >= duckX &&
     x <= duckX + duckWidth &&
@@ -73,23 +78,36 @@ function isDuckClicked(x, y, duckX, duckY, duckWidth, duckHeight) {
 
 class Duck {
   constructor(x, y, speed) {
-    this.image = new Image();
-    this.image.src = "./CANVASAPI_UI/ankka.gif";
+    this.spriteSheet = spriteSheet;
+    this.spriteWidth = 40.5;
+    this.spriteHeight = 35;
 
     this.x = x;
     this.y = y;
     this.speed = speed;
     this.dx = Math.random() < 0.5 ? 1 : -1;
     this.dy = Math.random() < 0.5 ? 1 : -1;
+    this.frameIndex = 0;
+    this.frameCount = 3;
+    this.frameInterval = 20;
+    this.frameCounter = 0;
     this.draw();
   }
-  draw() {
-    context.beginPath();
 
-    context.drawImage(this.image, this.x, this.y);
-    context.stroke();
-    context.closePath();
+  draw() {
+    context.drawImage(
+      this.spriteSheet,
+      this.frameIndex * this.spriteWidth + 3,
+      127,
+      this.spriteWidth,
+      this.spriteHeight,
+      this.x,
+      this.y,
+      duckWidth,
+      duckHeight
+    );
   }
+
   update() {
     if (this.x < 0) {
       this.dx = 1;
@@ -104,18 +122,24 @@ class Duck {
     if (this.y + duckHeight > window.innerHeight) {
       this.dy = -1;
     }
-    // console.log(this.y, this.x);
+
     this.x += this.dx * this.speed;
     this.y += this.dy * this.speed;
 
+    this.frameCounter++;
+    if (this.frameCounter >= this.frameInterval) {
+      this.frameCounter = 0;
+      this.frameIndex = (this.frameIndex + 1) % this.frameCount;
+    }
     this.draw();
   }
 }
 
-let updateDuckes = function () {
-  requestAnimationFrame(updateDuckes);
+let animateFrame = function () {
+  requestAnimationFrame(animateFrame);
   context.clearRect(0, 0, window.innerWidth, window.innerHeight);
-  duckes.forEach((element) => {
+  ducks.forEach((element) => {
     element.update();
   });
+  context.drawImage(background, 0, 50, window.innerWidth, window.innerHeight);
 };
