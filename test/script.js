@@ -9,21 +9,24 @@ window.onload = () => {
   let canvas = document.getElementById("gameCanvas");
   let context = canvas.getContext("2d");
 
-
-  // Esimerkki
+  // ESIMERKKI
   const ankkagif = new Image();
   ankkagif.src = "ankka.gif";
   const laukaus = new Audio("laukaus.mp3");
   laukaus.volume = 0.3;
-  // 
-  
+  //
+
   let duckX = 750;
   let duckY = 300;
   let duckWidth = 100;
   let duckHeight = 100;
 
+  let duckClick = false;
+
   ankkagif.onload = function() {
-    context.drawImage(ankkagif, duckX, duckY, duckWidth, duckHeight);
+    if (!duckClick) {
+      context.drawImage(ankkagif, duckX, duckY, duckWidth, duckHeight);
+    }
   };
 
   canvas.addEventListener("click", (event) => {
@@ -33,15 +36,14 @@ window.onload = () => {
 
     console.log("Shot at: ", x, y);
 
-    if (isDuckClicked(x, y, duckX, duckY, duckWidth, duckHeight)) {
+    if (!duckClick && isDuckClicked(x, y, duckX, duckY, duckWidth, duckHeight)) {
       scoreCount += 100;
       scoreLabel.innerText = scoreCount;
-    
       context.clearRect(duckX, duckY, duckWidth, duckHeight);
-      laukaus.currentTime = 0;
+      duckClick = true;
+      laukaus.currentTime = 0;  
       laukaus.play();
     }
-    
   });
 };
 
@@ -53,5 +55,6 @@ function isDuckClicked(x, y, duckX, duckY, duckWidth, duckHeight) {
     y <= duckY + duckHeight
   );
 }
+
 
 
