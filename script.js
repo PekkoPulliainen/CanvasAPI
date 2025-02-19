@@ -72,8 +72,8 @@ window.onload = () => {
     }
   });
   for (let i = 0; i < 4; i++) {
-    let x = Math.random() * (canvas.width - duckWidth);
-    let y = Math.random() * (canvas.height - duckHeight);
+    let x = Math.round(Math.random() * (canvas.width - duckWidth));
+    let y = Math.round(Math.random() * (canvas.height - duckHeight));
     let duck = new Duck(x, y, 2);
     ducks.push(duck);
   }
@@ -136,12 +136,17 @@ class Duck {
     if (this.y + duckHeight > canvas.height) {
       this.dy = -1;
     }
+// change direction randomly
 
-    this.x += this.dx * this.speed;
-    this.y += this.dy * this.speed;
 
-    this.frameCounter++;
-    if (this.frameCounter >= this.frameInterval) {
+
+this.x += this.dx * this.speed;
+this.y += this.dy * this.speed;
+
+this.frameCounter++;
+if (this.frameCounter >= this.frameInterval) {
+      if (Math.random() > 0.9) this.dx *= -1
+      if (Math.random() > 0.9) this.dy *= -1
       this.frameCounter = 0;
       this.frameIndex = (this.frameIndex + 1) % this.frameCount;
     }
