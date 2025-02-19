@@ -66,7 +66,7 @@ window.onload = () => {
   animateFrame();
 };
 
-function isDuckClicked(x, y, duckX, duckY, duckWidth, duckHeight) {
+function isDuckClicked(x, y, duck) {
   bulletAudio.play();
   return (
     x >= duck.x &&
