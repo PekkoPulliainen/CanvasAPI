@@ -26,8 +26,11 @@ window.onload = () => {
   let duckWidth = 100;
   let duckHeight = 100;
 
+  let duckClick = false;
+
   ankkagif.onload = function () {
-    context.drawImage(ankkagif, duckX, duckY, duckWidth, duckHeight);
+    if (!duckClick)
+      context.drawImage(ankkagif, duckX, duckY, duckWidth, duckHeight);
   };
 
   canvas.addEventListener("click", (event) => {
@@ -37,11 +40,14 @@ window.onload = () => {
 
     console.log("Shot at: ", x, y);
 
-    if (isDuckClicked(x, y, duckX, duckY, duckWidth, duckHeight)) {
+    if (
+      !duckClick &&
+      isDuckClicked(x, y, duckX, duckY, duckWidth, duckHeight)
+    ) {
       scoreCount += 100;
       scoreLabel.innerText = scoreCount;
-
       context.clearRect(duckX, duckY, duckWidth, duckHeight);
+      duckClick = true;
       laukaus.currentTime = 0;
       laukaus.play();
     }
@@ -99,7 +105,6 @@ class Duck {
       this.dy = -1;
     }
     // console.log(this.y, this.x);
-
     this.x += this.dx * this.speed;
     this.y += this.dy * this.speed;
 
