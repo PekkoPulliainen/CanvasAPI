@@ -151,18 +151,16 @@ canvas.addEventListener("click", (event) => {
 
   console.log("Shot at: ", x, y);
 
-  for (let i = 0; i < duckes.length; i++) {
-    if (isDuckClicked(x, y, duckes[i])) {
-      duckes.splice(i, 1);
+   
+  for (let i = 0; i < ducks.length; i++) {
+    if (isDuckClicked(x, y, ducks[i])) {
+      ducks.splice(i, 1);
 
       let scoreCount = parseInt(
         document.getElementById("scoreLabel").innerText
       );
       scoreCount += 100;
       document.getElementById("scoreLabel").innerText = scoreCount;
-
-      laukaus.currentTime = 0;
-      laukaus.play();
 
       break;
     }
