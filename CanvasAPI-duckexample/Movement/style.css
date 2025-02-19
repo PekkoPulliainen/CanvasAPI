@@ -7,10 +7,6 @@
   top: 2%;
   right: 2%;
   font-size: 180%;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
 }
 
 body {

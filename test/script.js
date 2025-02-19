@@ -36,9 +36,12 @@ window.onload = () => {
     if (isDuckClicked(x, y, duckX, duckY, duckWidth, duckHeight)) {
       scoreCount += 100;
       scoreLabel.innerText = scoreCount;
-      context.drawImage(ankkagif, duckX, duckY, duckWidth, duckHeight);
+    
+      context.clearRect(duckX, duckY, duckWidth, duckHeight);
+      laukaus.currentTime = 0;
       laukaus.play();
     }
+    
   });
 };
 
