@@ -1,13 +1,15 @@
 let lastMouseX;
 let lastMouseY;
+let duckWidth = 250;
+let duckHeight = 250;
+
+let canvas = document.getElementById("gameCanvas");
+let context = canvas.getContext("2d");
 
 window.onload = () => {
   let scoreCount = 0;
   let scoreLabel = document.getElementById("scoreLabel");
   scoreLabel.innerText = scoreCount;
-
-  let canvas = document.getElementById("gameCanvas");
-  let context = canvas.getContext("2d");
 
   canvas.addEventListener("click", (event) => {
     let rect = canvas.getBoundingClientRect();
@@ -21,13 +23,22 @@ window.onload = () => {
       scoreLabel.innerText = scoreCount;
     }
   });
+
+  for (var i = 0; i < 4; i++) {
+    var x = Math.random() * window.innerWidth;
+    var y = Math.random() * window.innerHeight;
+    var duck = new Duck(x, y, 1);
+    duckes.push(duck);
+
+  }
+  updateDuckes();
+
 };
 
 function isDuckClicked(x, y) {
   let duckX = 100;
   let duckY = 100;
-  let duckWidth = 50;
-  let duckHeight = 50;
+
 
   return (
     x >= duckX &&
@@ -36,3 +47,66 @@ function isDuckClicked(x, y) {
     y <= duckY + duckHeight
   );
 }
+class Duck {
+  constructor(x, y, speed) {
+    this.image = new Image();
+    this.image.src = './CANVASAPI_UI/ankka.gif';
+
+    this.x = x;
+    this.y = y;
+    this.speed = speed;
+    this.dx = (Math.random() < 0.5) ? 1 : -1;
+    this.dy = (Math.random() < 0.5) ? 1 : -1;
+    this.draw();
+  }
+  draw() {
+    context.beginPath();
+
+ 
+    context.drawImage(this.image, this.x, this.y);
+    context.stroke();
+    context.closePath();
+
+  }
+  update() {
+    if (this.x < 0) {
+      this.dx = 1;
+    }
+    if (this.x + duckWidth > window.innerWidth) {
+      this.dx = -1;
+    }
+
+    if (this.y < 0) {
+      this.dy = 1;
+    }
+    if (this.y + duckHeight > window.innerHeight) {
+      this.dy = -1;
+    }
+    // console.log(this.y, this.x);
+
+    this.x += this.dx * this.speed;
+    this.y += this.dy * this.speed;
+
+
+    this.draw();
+  }
+
+}
+
+
+
+
+let updateDuckes = function () {
+  requestAnimationFrame(updateDuckes);
+  context.clearRect(0, 0, window.innerWidth, window.innerHeight);
+  duckes.forEach(element => {
+    element.update();
+
+
+  });
+
+}
+
+
+let duckes = [];
+
