@@ -29,6 +29,8 @@ canvas.style.backgroundColor = "rgb(88, 159, 241)";
 const bulletAudio = new Audio("./CANVASAPI_UI/laukaus.mp3");
 bulletAudio.volume = 0.05;
 
+let gameStarted = false;
+
 window.onload = () => {
   let scoreCount = 0;
 
@@ -38,6 +40,18 @@ window.onload = () => {
   let duckHeight = 100;
 
   let duckClick = false;
+
+  // Start Game -nappulan klikkaus
+  document.getElementById("startGameButton").addEventListener("click", () => {
+    gameStarted = true;
+    document.getElementById("startGameDiv").style.display = "none";
+  })
+
+  // Start Game -nappulan klikkaus
+  document.getElementById("restartButton").addEventListener("click", () => {
+    gameStarted = true;
+    document.getElementById("restartDiv").style.display = "none";
+  })
 
   canvas.addEventListener("click", (event) => {
     let rect = canvas.getBoundingClientRect();

@@ -9,6 +9,11 @@ html {
   margin: 0;
   padding: 0;
 }
+
+p {
+  font: bold 18px monospace;
+}
+
 #gameCanvas {
   display: block;
   width: 100%;
@@ -25,4 +30,95 @@ html {
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+}
+
+#startGameDiv {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #e4e4e4;
+  text-align: center;
+  font: 20px monospace;
+  color: #7c0800;
+  padding: 10px 50px 40px 50px;
+  border: 3px solid #005000;
+  border-radius: 3px;
+  
+}
+
+#startGameButton {
+  background: #80d010;
+  color: #7c0800;
+  font: bold 14px monospace;
+  width: 100%;
+  padding: 5px;
+  border: none;
+  border-radius: 2px;
+  box-shadow: 5px 5px 0 #005000;
+  cursor: pointer;
+}
+
+#startGameButton:hover{
+  background: #80d010;
+  color: #7c0800;
+  font: bold 14px monospace;
+  width: 100%;
+  padding: 5px;
+  border: none;
+  border-radius: 2px;
+  box-shadow: 5px 5px 0 #005000;
+  cursor: pointer;
+  transform: scale(1.05);
+}
+
+#gameOverDiv {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #e4e4e4;
+  text-align: center;
+  font: 15px monospace;
+  color: #7c0800;
+  padding: 10px 50px 40px 50px;
+  border: 3px solid #005000;
+  border-radius: 3px;
+  
+}
+
+#finalScore {
+  font-size: 50px;
+  margin-bottom: 0;
+}
+
+#finalScoreLabel {
+  font-size: 12px;
+  margin-top: 0;
+  margin-bottom: 50px;
+}
+
+#restartButton {
+  background: #80d010;
+  color: #7c0800;
+  font: bold 14px monospace;
+  width: 100%;
+  padding: 5px;
+  border: none;
+  border-radius: 2px;
+  box-shadow: 5px 5px 0 #005000;
+  cursor: pointer;
+}
+
+#restartButton:hover{
+  background: #80d010;
+  color: #7c0800;
+  font: bold 14px monospace;
+  width: 100%;
+  padding: 5px;
+  border: none;
+  border-radius: 2px;
+  box-shadow: 5px 5px 0 #005000;
+  cursor: pointer;
+  transform: scale(1.05);
 }
