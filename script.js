@@ -58,9 +58,9 @@ window.onload = () => {
     }
   });
   for (let i = 0; i < 4; i++) {
-    let x = Math.random() * window.innerWidth;
-    let y = Math.random() * window.innerHeight;
-    let duck = new Duck(x, y, 1);
+    let x = Math.random() * (canvas.width - duckWidth);
+    let y = Math.random() * (canvas.height - duckHeight);
+    let duck = new Duck(x, y, 2);
     ducks.push(duck);
   }
   animateFrame();
@@ -69,10 +69,10 @@ window.onload = () => {
 function isDuckClicked(x, y, duckX, duckY, duckWidth, duckHeight) {
   bulletAudio.play();
   return (
-    x >= duckX &&
-    x <= duckX + duckWidth &&
-    y >= duckY &&
-    y <= duckY + duckHeight
+    x >= duck.x &&
+    x <= duck.x + duckWidth &&
+    y >= duck.y &&
+    y <= duck.y + duckHeight
   );
 }
 
@@ -112,14 +112,14 @@ class Duck {
     if (this.x < 0) {
       this.dx = 1;
     }
-    if (this.x + duckWidth > window.innerWidth) {
+    if (this.x + duckWidth > canvas.width) {
       this.dx = -1;
     }
 
     if (this.y < 0) {
       this.dy = 1;
     }
-    if (this.y + duckHeight > window.innerHeight) {
+    if (this.y + duckHeight > canvas.height) {
       this.dy = -1;
     }
 
@@ -137,9 +137,34 @@ class Duck {
 
 let animateFrame = function () {
   requestAnimationFrame(animateFrame);
-  context.clearRect(0, 0, window.innerWidth, window.innerHeight);
+  context.clearRect(0, 0, canvas.width, canvas.height);
   ducks.forEach((element) => {
     element.update();
   });
   context.drawImage(background, 0, 50, window.innerWidth, window.innerHeight);
 };
+
+canvas.addEventListener("click", (event) => {
+  let rect = canvas.getBoundingClientRect();
+  let x = event.clientX - rect.left;
+  let y = event.clientY - rect.top;
+
+  console.log("Shot at: ", x, y);
+
+  for (let i = 0; i < duckes.length; i++) {
+    if (isDuckClicked(x, y, duckes[i])) {
+      duckes.splice(i, 1);
+
+      let scoreCount = parseInt(
+        document.getElementById("scoreLabel").innerText
+      );
+      scoreCount += 100;
+      document.getElementById("scoreLabel").innerText = scoreCount;
+
+      laukaus.currentTime = 0;
+      laukaus.play();
+
+      break;
+    }
+  }
+});
