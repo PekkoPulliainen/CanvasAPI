@@ -10,6 +10,10 @@ html {
   padding: 0;
 }
 
+p {
+  font: bold 18px monospace;
+}
+
 #gameCanvas {
   display: block;
   width: 100%;
@@ -83,16 +87,6 @@ html {
   border: 3px solid #005000;
   border-radius: 3px;
   
-}
-
-
-
-
-
-
-
-p {
-  font: bold 18px monospace;
 }
 
 #finalScore {
