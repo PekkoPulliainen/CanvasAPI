@@ -48,6 +48,18 @@ window.onload = () => {
 
   let duckClick = false;
 
+    // Start Game -nappulan klikkaus
+    document.getElementById("startGameButton").addEventListener("click", () => {
+      gameStarted = true;
+      document.getElementById("startGameDiv").style.display = "none";
+    })
+  
+    // Restart -nappulan klikkaus
+    document.getElementById("restartButton").addEventListener("click", () => {
+      gameStarted = true;
+      document.getElementById("gameOverDiv").style.display = "none";
+    })  
+
   canvas.addEventListener("click", (event) => {
     let rect = canvas.getBoundingClientRect();
     let x = event.clientX - rect.left;

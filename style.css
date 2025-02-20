@@ -10,10 +10,6 @@ html {
   padding: 0;
 }
 
-p {
-  font: bold 18px monospace;
-}
-
 #gameCanvas {
   display: block;
   width: 100%;
@@ -31,6 +27,8 @@ p {
   -ms-user-select: none;
   user-select: none;
 }
+
+
 
 #startGameDiv {
   position: fixed;
@@ -87,6 +85,16 @@ p {
   
 }
 
+
+
+
+
+
+
+p {
+  font: bold 18px monospace;
+}
+
 #finalScore {
   font-size: 50px;
   margin-bottom: 0;
@@ -122,3 +130,9 @@ p {
   cursor: pointer;
   transform: scale(1.05);
 }
+    
+
+
+
+
+
