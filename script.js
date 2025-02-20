@@ -47,10 +47,10 @@ window.onload = () => {
     document.getElementById("startGameDiv").style.display = "none";
   })
 
-  // Start Game -nappulan klikkaus
+  // Restart -nappulan klikkaus
   document.getElementById("restartButton").addEventListener("click", () => {
     gameStarted = true;
-    document.getElementById("restartDiv").style.display = "none";
+    document.getElementById("gameOverDiv").style.display = "none";
   })
 
   canvas.addEventListener("click", (event) => {
