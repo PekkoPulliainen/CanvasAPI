@@ -244,6 +244,67 @@ class Duck {
   }
 }
 
+class Dog { // Kesken
+  constructor(x, y, speed, spriteSheet) {
+    this.spriteSheet = spriteSheet;
+    this.spriteWidth = 0;
+    this.spriteHeight = 0;
+
+    this.x = x;
+    this.y = y;
+    this.dx = speed;
+
+    this.frameIndex = 0;
+    this.frameCount = 0;
+    this.frameInterval = 0;
+    this.frameCounter = 0;
+
+    this.draw();
+  }
+
+  draw() {
+    let spriteSheetX = this.frameIndex * this.spriteWidth;
+    let spriteSheetY = 0;
+
+    if (this.dx < 0) {
+      context.translate(this.x + dogWidth, this.y);
+      context.scale(-1, 1);
+      context.drawImage(
+        this.spriteSheet,
+        spriteSheetX + 3,
+        spriteSheetY,
+        this.spriteWidth,
+        this.spriteHeight,
+        0,
+        0,
+        dogWidth,
+        dogHeight
+      );
+      context.setTransform(1, 0, 0, 1, 0, 0);
+    } else {
+      context.drawImage(
+        this.spriteSheet,
+        spriteSheetX + 0,
+        spriteSheetY + 0,
+        this.spriteWidth - 0,
+        this.spriteHeight,
+        this.x,
+        this.y,
+        dogWidth,
+        dogHeight
+      );
+    }
+  }
+
+  update() {
+    if (this.x < 0 || this.x + dogWidth > canvas.width) {
+      this.dx *= -1;
+    }
+
+    this.x += this.dx;
+  }
+}
+
 let animateFrame = function () {
   requestAnimationFrame(animateFrame);
   context.clearRect(0, 0, canvas.width, canvas.height);
