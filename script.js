@@ -43,22 +43,22 @@ window.onload = () => {
 
   let duckX = 750;
   let duckY = 300;
-  let duckWidth = 100;
-  let duckHeight = 100;
+  let duckWidth = 40;
+  let duckHeight = 40;
 
   let duckClick = false;
 
-    // Start Game -nappulan klikkaus
-    document.getElementById("startGameButton").addEventListener("click", () => {
-      gameStarted = true;
-      document.getElementById("startGameDiv").style.display = "none";
-    })
-  
-    // Restart -nappulan klikkaus
-    document.getElementById("restartButton").addEventListener("click", () => {
-      gameStarted = true;
-      document.getElementById("gameOverDiv").style.display = "none";
-    })  
+  // Start Game -nappulan klikkaus
+  document.getElementById("startGameButton").addEventListener("click", () => {
+    gameStarted = true;
+    document.getElementById("startGameDiv").style.display = "none";
+  })
+
+  // Restart -nappulan klikkaus
+  document.getElementById("restartButton").addEventListener("click", () => {
+    gameStarted = true;
+    document.getElementById("gameOverDiv").style.display = "none";
+  })
 
   canvas.addEventListener("click", (event) => {
     let rect = canvas.getBoundingClientRect();
@@ -78,10 +78,13 @@ window.onload = () => {
       bulletAudio.play();
     }
   });
+  var color = 0;
   for (let i = 0; i < 4; i++) {
     let x = Math.round(Math.random() * (canvas.width - duckWidth));
     let y = Math.round(Math.random() * (canvas.height - duckHeight));
-    let duck = new Duck(x, y, 2);
+    let duck = new Duck(x, y, color, 2);
+    color += 1;
+    if (i % 3 == 0) { color = 0; }
     ducks.push(duck);
   }
   animateFrame();
@@ -98,31 +101,31 @@ function isDuckClicked(x, y, duck) {
 }
 
 class Duck {
-  constructor(x, y, speed) {
+  constructor(x, y, count, speed) {
     this.spriteSheet = spriteSheet;
     this.spriteSheetMirrored = spriteSheetMirrored;
-    this.spriteWidth = 40.5;
-    this.spriteHeight = 35;
-
+    this.spriteWidth = 40;
+    this.spriteHeight = 40;
+    this.spriteSheetY = 146+count*this.spriteHeight;
     this.x = x;
     this.y = y;
     this.speed = speed;
     this.dx = Math.random() < 0.5 ? 1 : -1;
     this.dy = (Math.random() - 0.5) * 0.2;
+    this.dy = 1;
     this.frameIndex = 0;
     this.frameCount = 3;
     this.frameInterval = 40;
     this.frameCounter = 0;
     this.directionChangeCounter = 0;
     this.directionChangeInterval = 700;
-    this.diagonalSpriteRow = 125;
-    this.horizontalSpriteRow = 162;
+
     this.draw();
   }
 
   draw() {
     let spriteSheetX = this.frameIndex * this.spriteWidth;
-    let spriteSheetY = 127;
+    let spriteSheetY = this.spriteSheetY;
 
     if (this.dx !== 0 && Math.abs(this.dy) > 0.1) {
       diagonal = true;
@@ -130,26 +133,30 @@ class Duck {
       diagonal = false;
     }
 
+
+
     if (this.dx < 0) {
-      context.translate(this.x + duckWidth, this.y);
-      context.scale(-1, 1);
-      context.drawImage(
-        this.spriteSheet,
-        spriteSheetX + 3,
-        spriteSheetY,
-        this.spriteWidth,
-        this.spriteHeight,
-        0,
-        0,
-        duckWidth,
-        duckHeight
-      );
-      context.setTransform(1, 0, 0, 1, 0, 0);
-    } else {
+
+
       if (diagonal === false) {
+        context.translate(this.x + duckWidth, this.y);
+        context.scale(-1, 1);
         context.drawImage(
           this.spriteSheet,
-          spriteSheetX + 3,
+          spriteSheetX,
+          spriteSheetY,
+          this.spriteWidth,
+          this.spriteHeight,
+          0,
+          0,
+          duckWidth,
+          duckHeight
+        );
+      }
+      else {
+        context.drawImage(
+          this.spriteSheet,
+          this.spriteWidth*3+spriteSheetX,
           spriteSheetY,
           this.spriteWidth,
           this.spriteHeight,
@@ -158,24 +165,16 @@ class Duck {
           duckWidth,
           duckHeight
         );
-      } else if (diagonal === true && this.frameIndex === 0) {
+
+      }
+      context.setTransform(1, 0, 0, 1, 0, 0);
+    } else {
+      if (diagonal === false) {
         context.drawImage(
           this.spriteSheet,
-          spriteSheetX + 129,
+          spriteSheetX,
           spriteSheetY,
-          this.spriteWidth - 3,
-          this.spriteHeight,
-          this.x,
-          this.y,
-          duckWidth,
-          duckHeight
-        );
-      } else if (diagonal === true && this.frameIndex === 1) {
-        context.drawImage(
-          this.spriteSheet,
-          spriteSheetX + 125.8,
-          spriteSheetY,
-          this.spriteWidth - 3,
+          this.spriteWidth,
           this.spriteHeight,
           this.x,
           this.y,
@@ -185,16 +184,15 @@ class Duck {
       } else {
         context.drawImage(
           this.spriteSheet,
-          spriteSheetX + 120.1,
-          spriteSheetY + 2,
-          this.spriteWidth - 3.8,
+          this.spriteWidth*3+spriteSheetX,
+          spriteSheetY,
+          this.spriteWidth,
           this.spriteHeight,
           this.x,
           this.y,
           duckWidth,
-          duckHeight
-        );
-      }
+          duckHeight);
+     }
     }
   }
 
@@ -247,8 +245,8 @@ class Duck {
 class Dog { // Kesken
   constructor(x, y, speed, spriteSheet) {
     this.spriteSheet = spriteSheet;
-    this.spriteWidth = 0;
-    this.spriteHeight = 0;
+    this.spriteWidth = 70;
+    this.spriteHeight = 70;
 
     this.x = x;
     this.y = y;
