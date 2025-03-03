@@ -10,6 +10,8 @@ let mirrored;
 let canvas = document.getElementById("gameCanvas");
 let context = canvas.getContext("2d");
 
+const Score = document.getElementById("Score");
+
 function resizeCanvas() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
@@ -59,7 +61,10 @@ window.onload = () => {
     document.getElementById("gameOverDiv").style.display = "none";
   });
 
+
   canvas.addEventListener("click", (event) => {
+    if (!gameStarted) return;
+
     let rect = canvas.getBoundingClientRect();
     let x = event.clientX - rect.left;
     let y = event.clientY - rect.top;
@@ -71,6 +76,7 @@ window.onload = () => {
       isDuckClicked(x, y, duckX, duckY, duckWidth, duckHeight)
     ) {
       scoreCount += 100;
+      Score.textContent = scoreCount;
       context.clearRect(duckX, duckY, duckWidth, duckHeight);
       duckClick = true;
       bulletAudio.currentTime = 0;
@@ -348,7 +354,9 @@ let animateFrame = function () {
   context.fillText(scoreCount, 2300, 150);
 };
 
+
 canvas.addEventListener("click", (event) => {
+  if (!gameStarted) return;
   let rect = canvas.getBoundingClientRect();
   let x = event.clientX - rect.left;
   let y = event.clientY - rect.top;
@@ -361,8 +369,8 @@ canvas.addEventListener("click", (event) => {
       ducks[i].frameIndex = 0;
       deadDucks.push(ducks[i]);
       ducks.splice(i, 1);
-
       scoreCount += 100;
+      Score.textContent = scoreCount;
       bulletAudio.currentTime = 0;
       bulletAudio.play();
 
@@ -370,3 +378,4 @@ canvas.addEventListener("click", (event) => {
     }
   }
 });
+
