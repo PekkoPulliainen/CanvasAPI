@@ -24,15 +24,18 @@ let sheetHeight = 294;
 let ducks = [];
 let deadDucks = [];
 
+const background2 = new Image();
+background2.src = "./CANVASAPI_UI/background-new-3.png";
+
 const background = new Image();
-background.src = "./CANVASAPI_UI/background-update.png";
+background.src = "./CANVASAPI_UI/background-new-2-6.png";
 
 const spriteSheet = new Image();
 spriteSheet.src = "./CANVASAPI_UI/sprites-remake.png";
 const spriteSheetMirrored = new Image();
 spriteSheetMirrored.src = "./CANVASAPI_UI/sprites-remake-mirror.png";
 
-canvas.style.backgroundColor = "rgb(88, 159, 241)";
+canvas.style.backgroundColor = "rgb(51, 117, 192)";
 
 const bulletAudio = new Audio("./CANVASAPI_UI/laukaus.mp3");
 bulletAudio.volume = 0.05;
@@ -79,7 +82,7 @@ window.onload = () => {
   });
   let color = 0;
 
-  for (let i = 0; i < 8; i++) {
+  for (let i = 0; i < 16; i++) {
     let x = Math.round(Math.random() * (canvas.width - duckWidth));
     let y = Math.round(Math.random() * (canvas.height - duckHeight));
     let duck = new Duck(x, y, color, 2);
@@ -121,6 +124,7 @@ class Duck {
     this.frameCounter = 0;
     this.directionChangeCounter = 0;
     this.directionChangeInterval = 700;
+    this.deadDelayCounter = 0;
 
     this.draw();
   }
@@ -239,27 +243,29 @@ class Duck {
   }
 
   updateDeads() {
-    this.drawDead();
-    this.y += this.speed;
-    this.frameCounter++;
-    if (this.frameCounter >= 10) {
-      this.frameCounter = 0;
-      this.frameIndex = 1 + ((this.frameIndex + 1) % 5);
-      // this.frameIndex = (this.frameIndex + 1) % this.frameCount;
-    }
-    if (this.y >= canvas.height) {
-      deadDucks = deadDucks.filter((element) => element !== this);
+    if (this.deadDelayCounter < 70) {
+      this.deadDelayCounter++;
+      this.drawDead(0);
+    } else {
+      this.drawDead(this.frameIndex);
+      this.y += this.speed;
+      this.frameCounter++;
+      if (this.frameCounter >= 10) {
+        this.frameCounter = 0;
+        this.frameIndex = 1 + (this.frameIndex % 4);
+      }
+      if (this.y >= canvas.height) {
+        deadDucks = deadDucks.filter((element) => element !== this);
+      }
     }
   }
-
-  drawDead() {
-    let spriteSheetX =
-      this.spriteWidth * 6 + this.frameIndex * this.spriteWidth;
+  drawDead(frameIndex) {
+    let spriteSheetX = this.spriteWidth * 6 + frameIndex * this.spriteWidth;
     context.drawImage(
       this.spriteSheet,
-      spriteSheetX,
+      spriteSheetX + 2,
       this.spriteSheetY,
-      this.spriteWidth,
+      this.spriteWidth - 6,
       this.spriteHeight,
       this.x,
       this.y,
@@ -334,6 +340,7 @@ class Dog {
 let animateFrame = function () {
   requestAnimationFrame(animateFrame);
   context.clearRect(0, 0, canvas.width, canvas.height);
+  context.drawImage(background2, 0, 0, window.innerWidth, window.innerHeight);
   ducks.forEach((element) => {
     element.update();
     context.imageSmoothingEnabled = false;
@@ -342,7 +349,7 @@ let animateFrame = function () {
     element.updateDeads();
     context.imageSmoothingEnabled = false;
   });
-  context.drawImage(background, 0, 50, window.innerWidth, window.innerHeight);
+  context.drawImage(background, 0, 110, window.innerWidth, window.innerHeight);
   context.font = "50px Arial";
   context.fillStyle = "White";
   context.fillText(scoreCount, 2300, 150);
@@ -359,6 +366,7 @@ canvas.addEventListener("click", (event) => {
     if (isDuckClicked(x, y, ducks[i])) {
       ducks[i].frameCounter = 0;
       ducks[i].frameIndex = 0;
+      console.log(ducks[i]);
       deadDucks.push(ducks[i]);
       ducks.splice(i, 1);
 
