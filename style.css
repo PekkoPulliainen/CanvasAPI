@@ -72,13 +72,13 @@ p {
   border-radius: 3px;
 }
 
-#finalScore {
+#finalScore, #Score {
   font-size: 50px;
   margin-bottom: 0;
 }
 
 #finalScoreLabel {
-  font-size: 12px;
+  font-size: 120px;
   margin-top: 0;
   margin-bottom: 50px;
 }
