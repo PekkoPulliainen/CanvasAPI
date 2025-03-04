@@ -393,7 +393,6 @@ canvas.addEventListener("click", (event) => {
       deadDucks.push(ducks[i]);
       ducks.splice(i, 1);
       scoreCount += 100;
-      Score.textContent = scoreCount;
       bulletAudio.currentTime = 0;
       bulletAudio.play();
 
