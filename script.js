@@ -6,6 +6,15 @@ let scoreCount = 0;
 let diagonal = false;
 let horizontal = false;
 let mirrored;
+let duckCount = 2;
+let ducksAlive = 0;
+let roundCounter = 0;
+let color = 0;
+let duckSpawnInterval;
+let hasShot = false;
+let flashDuration = 10;
+let shotCooldownInterval;
+let shotCooldown = 0;
 
 let canvas = document.getElementById("gameCanvas");
 let context = canvas.getContext("2d");
@@ -28,6 +37,9 @@ let dog;
 
 const Score = document.getElementById("Score");
 
+const dogIdle = new Image();
+dogIdle.src = "./CANVASAPI_UI/dogidle.png";
+
 const background2 = new Image();
 background2.src = "./CANVASAPI_UI/background-new-3.png";
 
@@ -47,56 +59,24 @@ bulletAudio.volume = 0.05;
 let gameStarted = false;
 
 window.onload = () => {
-  let duckX = 750;
-  let duckY = 300;
-
-  let duckClick = false;
+  resizeCanvas();
 
   // Start Game -nappulan klikkaus
   document.getElementById("startGameButton").addEventListener("click", () => {
     gameStarted = true;
     document.getElementById("startGameDiv").style.display = "none";
+    startDuckSpawnCounter();
   });
 
   // Restart -nappulan klikkaus
   document.getElementById("restartButton").addEventListener("click", () => {
     gameStarted = true;
     document.getElementById("gameOverDiv").style.display = "none";
+    startDuckSpawnCounter();
   });
 
-  canvas.addEventListener("click", (event) => {
-    if (!gameStarted) return;
-
-    let rect = canvas.getBoundingClientRect();
-    let x = event.clientX - rect.left;
-    let y = event.clientY - rect.top;
-
-    console.log("Shot at: ", x, y);
-
-    if (
-      !duckClick &&
-      isDuckClicked(x, y, duckX, duckY, duckWidth, duckHeight)
-    ) {
-      scoreCount += 100;
-      Score.textContent = scoreCount;
-      context.clearRect(duckX, duckY, duckWidth, duckHeight);
-      duckClick = true;
-      bulletAudio.currentTime = 0;
-      bulletAudio.play();
-    }
-  });
-  let color = 0;
-
-  for (let i = 0; i < 16; i++) {
-    let x = Math.round(Math.random() * (canvas.width - duckWidth));
-    let y = Math.round(Math.random() * (canvas.height - duckHeight));
-    let duck = new Duck(x, y, color, 2);
-    color += 1;
-    if (i % 3 == 0) {
-      color = 0;
-    }
-    ducks.push(duck);
-  }
+  context.drawImage(background, 0, 0, window.innerWidth, window.innerHeight);
+  context.drawImage(background2, 0, 0, window.innerWidth, window.innerHeight);
 
   dog = new Dog(100, canvas.height * 0.71, 2, spriteSheet);
 
@@ -212,7 +192,7 @@ class Duck {
       this.dx *= -1;
       hitWall = true;
     }
-    if (this.y < 0 || this.y + duckHeight > canvas.height) {
+    if (this.y < 0 || this.y + duckHeight > canvas.height - 90) {
       this.dy *= -1;
       hitWall = true;
     }
@@ -294,7 +274,7 @@ class Dog {
     this.y = y;
     this.dx = speed;
 
-    this.frameIndex = 0;
+    this.frameIndex = 1;
     this.frameCount = 5;
     this.frameInterval = 10;
     this.frameCounter = 0;
@@ -338,6 +318,16 @@ class Dog {
     }
   }
 
+  drawIdle() {
+    context.drawImage(
+      dogIdle,
+      this.x,
+      this.y,
+      this.spriteWidth * 3,
+      this.spriteHeight * 3
+    );
+  }
+
   update() {
     if (this.x < 0 || this.x + this.spriteWidth * 3 > canvas.width) {
       this.dx *= -1;
@@ -355,17 +345,57 @@ class Dog {
   }
 }
 
+function startDuckSpawnCounter() {
+  duckSpawnInterval = setInterval(() => {
+    roundCounter++;
+    console.log("next spawn at 50 " + roundCounter);
+    if (roundCounter >= 50) {
+      clearInterval(duckSpawnInterval);
+      roundCounter = 0;
+      duckSpawn();
+    }
+  }, 100);
+}
+
+function startShotCooldownCounter() {
+  shotCooldownInterval = setInterval(() => {
+    shotCooldown++;
+    console.log("next shot at 25 " + shotCooldown);
+    if (shotCooldown === 25) {
+      hasShot = false;
+      clearInterval(shotCooldownInterval);
+      shotCooldown = 0;
+    }
+  }, 100);
+}
+
+function duckSpawn() {
+  duckCount += 1;
+  for (let i = 0; i < duckCount; i++) {
+    let x = Math.round(Math.random() * (canvas.width - duckWidth));
+    let y = Math.round(Math.random() * (canvas.height - duckHeight - 150));
+    let duck = new Duck(x, y, color, 2);
+    color += 1;
+    if (i % 3 == 0) {
+      color = 0;
+    }
+    ducksAlive = duckCount;
+    ducks.push(duck);
+  }
+}
+
 let animateFrame = function () {
   requestAnimationFrame(animateFrame);
+  context.imageSmoothingEnabled = false;
   context.clearRect(0, 0, canvas.width, canvas.height);
   context.drawImage(background2, 0, 0, window.innerWidth, window.innerHeight);
-  ducks.forEach((element) => {
-    element.update();
-    context.imageSmoothingEnabled = false;
-  });
+  if (ducksAlive > 0) {
+    ducks.forEach((element) => {
+      element.update();
+    });
+  }
   deadDucks.forEach((element) => {
     element.updateDeads();
-    context.imageSmoothingEnabled = false;
   });
 
   context.drawImage(background, 0, 110, window.innerWidth, window.innerHeight);
@@ -374,16 +404,37 @@ let animateFrame = function () {
   context.textAlign = "right";
   context.fillText(scoreCount, canvas.width - 20, 40);
 
-  dog.update();
+  if (!gameStarted) {
+    dog.drawIdle();
+  }
+
+  if (gameStarted) {
+    dog.update();
+  }
+
+  if (hasShot && shotCooldown === 0) {
+    if (flashDuration > 0) {
+      context.fillStyle = "rgba(255, 255, 255," + flashDuration / 10 + ")";
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      flashDuration--;
+    } else {
+      flashDuration = 10;
+    }
+  }
 };
 
 canvas.addEventListener("click", (event) => {
   if (!gameStarted) return;
+  if (hasShot) return;
   let rect = canvas.getBoundingClientRect();
   let x = event.clientX - rect.left;
   let y = event.clientY - rect.top;
 
   console.log("Shot at: ", x, y);
+
+  hasShot = true;
+
+  startShotCooldownCounter();
 
   for (let i = 0; i < ducks.length; i++) {
     if (isDuckClicked(x, y, ducks[i])) {
@@ -395,6 +446,10 @@ canvas.addEventListener("click", (event) => {
       scoreCount += 100;
       bulletAudio.currentTime = 0;
       bulletAudio.play();
+      ducksAlive -= 1;
+      if (ducksAlive === 0) {
+        startDuckSpawnCounter();
+      }
 
       break;
     }
