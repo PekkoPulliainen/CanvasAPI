@@ -15,6 +15,7 @@ let hasShot = false;
 let flashDuration = 10;
 let shotCooldownInterval;
 let shotCooldown = 0;
+let isPaused = false;
 
 let canvas = document.getElementById("gameCanvas");
 let context = canvas.getContext("2d");
@@ -49,7 +50,7 @@ background.src = "./CANVASAPI_UI/background-new-2-6.png";
 const spriteSheet = new Image();
 spriteSheet.src = "./CANVASAPI_UI/sprites-remake.png";
 const spriteSheetMirrored = new Image();
-spriteSheetMirrored.src = "./CANVASAPI_UI/sprites-remake-mirror.png";
+spriteSheetMirrored.src = "./CANVASAPI_UI/sprites-remake-mirrored.png";
 
 canvas.style.backgroundColor = "rgb(51, 117, 192)";
 
@@ -102,17 +103,20 @@ class Duck {
     this.spriteSheetY = 146 + count * this.spriteHeight;
     this.x = x;
     this.y = y;
-    this.speed = speed;
+    this.speed = speed + 5;
+    console.log("speed: " + this.speed);
     this.dx = Math.random() < 0.5 ? 1 : -1;
     this.dy = (Math.random() - 0.5) * 0.2;
     this.dy = 1;
     this.frameIndex = 0;
     this.frameCount = 3;
-    this.frameInterval = 40;
+    this.frameInterval = 8;
     this.frameCounter = 0;
     this.directionChangeCounter = 0;
     this.directionChangeInterval = 700;
     this.deadDelayCounter = 0;
+    this.speedChangeCounter = 0;
+    this.speedChangeInterval = 300;
 
     this.draw();
   }
@@ -143,14 +147,16 @@ class Duck {
           duckHeight
         );
       } else {
+        context.translate(this.x + duckWidth, this.y);
+        context.scale(-1, 1);
         context.drawImage(
           this.spriteSheet,
           this.spriteWidth * 3 + spriteSheetX,
           spriteSheetY,
           this.spriteWidth,
           this.spriteHeight,
-          this.x,
-          this.y,
+          0,
+          0,
           duckWidth,
           duckHeight
         );
@@ -217,7 +223,18 @@ class Duck {
       this.directionChangeCounter = 0;
       this.changeDirection();
     }
+
+    this.speedChangeCounter++;
+    if (this.speedChangeCounter >= this.speedChangeInterval) {
+      this.speedChangeCounter = 0;
+      this.changeSpeed();
+    }
     this.draw();
+  }
+
+  changeSpeed() {
+    this.speed = 7 + Math.random() * 4;
+    console.log("new speed: " + this.speed);
   }
 
   changeDirection() {
@@ -346,10 +363,11 @@ class Dog {
 }
 
 function startDuckSpawnCounter() {
+  console.log("next round in 3.5 seconds...");
   duckSpawnInterval = setInterval(() => {
+    if (isPaused) return;
     roundCounter++;
-    console.log("next spawn at 50 " + roundCounter);
-    if (roundCounter >= 50) {
+    if (roundCounter >= 35) {
       clearInterval(duckSpawnInterval);
       roundCounter = 0;
       duckSpawn();
@@ -358,9 +376,10 @@ function startDuckSpawnCounter() {
 }
 
 function startShotCooldownCounter() {
+  console.log("reloading...");
   shotCooldownInterval = setInterval(() => {
+    if (isPaused) return;
     shotCooldown++;
-    console.log("next shot at 25 " + shotCooldown);
     if (shotCooldown === 25) {
       hasShot = false;
       clearInterval(shotCooldownInterval);
@@ -372,8 +391,8 @@ function startShotCooldownCounter() {
 function duckSpawn() {
   duckCount += 1;
   for (let i = 0; i < duckCount; i++) {
-    let x = Math.round(Math.random() * (canvas.width - duckWidth));
-    let y = Math.round(Math.random() * (canvas.height - duckHeight - 150));
+    let x = canvas.width / 2 - duckWidth / 2;
+    let y = canvas.height - duckHeight - 160;
     let duck = new Duck(x, y, color, 2);
     color += 1;
     if (i % 3 == 0) {
@@ -385,6 +404,8 @@ function duckSpawn() {
 }
 
 let animateFrame = function () {
+  if (isPaused) return;
+
   requestAnimationFrame(animateFrame);
   context.imageSmoothingEnabled = false;
   context.clearRect(0, 0, canvas.width, canvas.height);
@@ -424,6 +445,7 @@ let animateFrame = function () {
 };
 
 canvas.addEventListener("click", (event) => {
+  if (isPaused) return;
   if (!gameStarted) return;
   if (hasShot) return;
   let rect = canvas.getBoundingClientRect();
@@ -453,5 +475,17 @@ canvas.addEventListener("click", (event) => {
 
       break;
     }
+  }
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "p" || event.key === "P") {
+    if (isPaused) {
+      isPaused = false;
+      animateFrame();
+    } else {
+      isPaused = true;
+    }
+    console.log("pause status: " + isPaused);
   }
 });
