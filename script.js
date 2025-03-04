@@ -10,8 +10,6 @@ let mirrored;
 let canvas = document.getElementById("gameCanvas");
 let context = canvas.getContext("2d");
 
-const Score = document.getElementById("Score");
-
 function resizeCanvas() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
@@ -27,6 +25,8 @@ let ducks = [];
 let deadDucks = [];
 
 let dog;
+
+const Score = document.getElementById("Score");
 
 const background2 = new Image();
 background2.src = "./CANVASAPI_UI/background-new-3.png";
@@ -47,8 +47,6 @@ bulletAudio.volume = 0.05;
 let gameStarted = false;
 
 window.onload = () => {
-  let scoreCount = 0;
-
   let duckX = 750;
   let duckY = 300;
 
@@ -65,7 +63,6 @@ window.onload = () => {
     gameStarted = true;
     document.getElementById("gameOverDiv").style.display = "none";
   });
-
 
   canvas.addEventListener("click", (event) => {
     if (!gameStarted) return;
@@ -311,35 +308,35 @@ class Dog {
     let spriteSheetX = this.frameIndex * this.spriteWidth;
 
     if (this.dx < 0) {
-        context.save();
-        context.translate(this.x + this.spriteWidth * 3, this.y);
-        context.scale(-1, 1);
-        context.drawImage(
-            this.spriteSheet,
-            spriteSheetX,
-            this.spriteSheetY,
-            this.spriteWidth,
-            this.spriteHeight,
-            0,
-            0,
-            this.spriteWidth * 4,
-            this.spriteHeight * 4
-        );
-        context.restore();
+      context.save();
+      context.translate(this.x + this.spriteWidth * 3, this.y);
+      context.scale(-1, 1);
+      context.drawImage(
+        this.spriteSheet,
+        spriteSheetX,
+        this.spriteSheetY,
+        this.spriteWidth,
+        this.spriteHeight,
+        0,
+        0,
+        this.spriteWidth * 4,
+        this.spriteHeight * 4
+      );
+      context.restore();
     } else {
-        context.drawImage(
-            this.spriteSheet,
-            spriteSheetX,
-            this.spriteSheetY,
-            this.spriteWidth,
-            this.spriteHeight,
-            this.x,
-            this.y,
-            this.spriteWidth * 4,
-            this.spriteHeight * 4
-        );
+      context.drawImage(
+        this.spriteSheet,
+        spriteSheetX,
+        this.spriteSheetY,
+        this.spriteWidth,
+        this.spriteHeight,
+        this.x,
+        this.y,
+        this.spriteWidth * 4,
+        this.spriteHeight * 4
+      );
     }
-}
+  }
 
   update() {
     if (this.x < 0 || this.x + this.spriteWidth * 3 > canvas.width) {
@@ -372,13 +369,13 @@ let animateFrame = function () {
   });
 
   context.drawImage(background, 0, 110, window.innerWidth, window.innerHeight);
-  context.font = "50px Arial";
+  context.font = "38px Arial";
   context.fillStyle = "White";
-  context.fillText(scoreCount, 2300, 150);
+  context.textAlign = "right";
+  context.fillText(scoreCount, canvas.width - 20, 40);
 
   dog.update();
 };
-
 
 canvas.addEventListener("click", (event) => {
   if (!gameStarted) return;
@@ -404,4 +401,3 @@ canvas.addEventListener("click", (event) => {
     }
   }
 });
-
