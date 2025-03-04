@@ -17,6 +17,7 @@ let shotCooldownInterval;
 let shotCooldown = 0;
 let isPaused = false;
 
+
 let canvas = document.getElementById("gameCanvas");
 let context = canvas.getContext("2d");
 
@@ -40,6 +41,12 @@ const Score = document.getElementById("Score");
 
 const dogIdle = new Image();
 dogIdle.src = "./CANVASAPI_UI/dogidle.png";
+
+const bulletImage = new Image();
+bulletImage.src = "./CANVASAPI_UI/bullet.png"
+
+let bullets = 10;
+let bullettext = "Amount of bullets " + 10;
 
 const background2 = new Image();
 background2.src = "./CANVASAPI_UI/background-new-3.png";
@@ -424,6 +431,9 @@ let animateFrame = function () {
   context.fillStyle = "White";
   context.textAlign = "right";
   context.fillText(scoreCount, canvas.width - 20, 40);
+  context.fillText(bullettext, canvas.width * 0.20, canvas.height * 0.05);
+
+
 
   if (!gameStarted) {
     dog.drawIdle();
@@ -432,14 +442,15 @@ let animateFrame = function () {
   if (gameStarted) {
     dog.update();
   }
-
-  if (hasShot && shotCooldown === 0) {
-    if (flashDuration > 0) {
-      context.fillStyle = "rgba(255, 255, 255," + flashDuration / 10 + ")";
-      context.fillRect(0, 0, canvas.width, canvas.height);
-      flashDuration--;
-    } else {
-      flashDuration = 10;
+  if(bullets > 0){
+    if (hasShot && shotCooldown === 0) {
+      if (flashDuration > 0) {
+        context.fillStyle = "rgba(255, 255, 255," + flashDuration / 10 + ")";
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        flashDuration--;
+      } else {
+        flashDuration = 10;
+      }
     }
   }
 };
@@ -453,27 +464,35 @@ canvas.addEventListener("click", (event) => {
   let y = event.clientY - rect.top;
 
   console.log("Shot at: ", x, y);
-
+  bullets -= 1;
+  if(0 > bullets){
+    bullets = 0
+  };
+  bullettext = "Amount of bullets " + bullets;
+  console.log(bullets);
   hasShot = true;
 
   startShotCooldownCounter();
+  if(bullets > 0){
+    for (let i = 0; i < ducks.length; i++) {
+      if (isDuckClicked(x, y, ducks[i])) {
+        ducks[i].frameCounter = 0;
+        ducks[i].frameIndex = 0;
+        console.log(ducks[i]);
+        deadDucks.push(ducks[i]);
+        ducks.splice(i, 1);
+        scoreCount += 100;
+        bulletAudio.currentTime = 0;
+        bulletAudio.play();
+        ducksAlive -= 1;
+        if (ducksAlive === 0) {
+          startDuckSpawnCounter();
+          bullets = 10;
+          bullettext = "Amount of bullets " + bullets;
+        }
 
-  for (let i = 0; i < ducks.length; i++) {
-    if (isDuckClicked(x, y, ducks[i])) {
-      ducks[i].frameCounter = 0;
-      ducks[i].frameIndex = 0;
-      console.log(ducks[i]);
-      deadDucks.push(ducks[i]);
-      ducks.splice(i, 1);
-      scoreCount += 100;
-      bulletAudio.currentTime = 0;
-      bulletAudio.play();
-      ducksAlive -= 1;
-      if (ducksAlive === 0) {
-        startDuckSpawnCounter();
+        break;
       }
-
-      break;
     }
   }
 });
