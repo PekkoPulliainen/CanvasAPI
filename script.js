@@ -59,6 +59,19 @@ spriteSheet.src = "./CANVASAPI_UI/sprites-remake.png";
 const spriteSheetMirrored = new Image();
 spriteSheetMirrored.src = "./CANVASAPI_UI/sprites-remake-mirrored.png";
 
+
+
+
+const target = {
+  "spriteTargetImage": new Image(),
+  "spriteTargetImageRed": new Image(),
+  "x": 0,
+  "y": 0
+};
+target.spriteTargetImage.src = "./CANVASAPI_UI/target.png";
+target.spriteTargetImageRed.src = "./CANVASAPI_UI/targetRed.png";
+
+
 canvas.style.backgroundColor = "rgb(51, 117, 192)";
 
 const bulletAudio = new Audio("./CANVASAPI_UI/laukaus.mp3");
@@ -433,8 +446,8 @@ let animateFrame = function () {
   context.fillText(scoreCount, canvas.width - 20, 40);
   context.fillText(bullettext, canvas.width * 0.20, canvas.height * 0.05);
 
-  for (let i=1; i<=bullets;i++){
-    context.drawImage(bulletImage, canvas.width * 0.2+50+10*i, canvas.height * 0.03);
+  for (let i = 1; i <= bullets; i++) {
+    context.drawImage(bulletImage, canvas.width * 0.2 + 50 + 10 * i, canvas.height * 0.03);
   }
 
 
@@ -444,8 +457,28 @@ let animateFrame = function () {
 
   if (gameStarted) {
     dog.update();
+    var targeredDucks = ducks.filter((duck) =>
+      target.x+123 >= duck.x &&
+      target.x+123 <= duck.x + duckWidth &&
+      target.y+123 >= duck.y &&
+      target.y+123 <= duck.y + duckHeight
+
+
+    );
+
+
+
+
+    if (targeredDucks.length > 0) {
+
+      context.drawImage(target.spriteTargetImageRed, target.x, target.y);
+    }
+    else {
+      context.drawImage(target.spriteTargetImage, target.x, target.y);
+
+    }
   }
-  if(bullets > 0){
+  if (bullets > 0) {
     if (hasShot && shotCooldown === 0) {
       if (flashDuration > 0) {
         context.fillStyle = "rgba(255, 255, 255," + flashDuration / 10 + ")";
@@ -457,6 +490,18 @@ let animateFrame = function () {
     }
   }
 };
+canvas.addEventListener("mousemove", (event) => {
+
+  if (isPaused) return;
+  if (!gameStarted) return;
+
+  let rect = canvas.getBoundingClientRect();
+  target.x = event.clientX - rect.left - 123;
+  target.y = event.clientY - rect.top - 123;
+
+
+});
+
 
 canvas.addEventListener("click", (event) => {
   if (isPaused) return;
@@ -468,7 +513,7 @@ canvas.addEventListener("click", (event) => {
 
   console.log("Shot at: ", x, y);
   bullets -= 1;
-  if(0 > bullets){
+  if (0 > bullets) {
     bullets = 0
   };
   bullettext = "Amount of bullets " + bullets;
@@ -477,7 +522,7 @@ canvas.addEventListener("click", (event) => {
   hasShot = true;
 
   startShotCooldownCounter();
-  if(bullets > 0){
+  if (bullets > 0) {
     for (let i = 0; i < ducks.length; i++) {
       if (isDuckClicked(x, y, ducks[i])) {
         ducks[i].frameCounter = 0;
