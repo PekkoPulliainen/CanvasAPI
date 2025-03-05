@@ -433,6 +433,9 @@ let animateFrame = function () {
   context.fillText(scoreCount, canvas.width - 20, 40);
   context.fillText(bullettext, canvas.width * 0.20, canvas.height * 0.05);
 
+  for (let i=1; i<=bullets;i++){
+    context.drawImage(bulletImage, canvas.width * 0.2+50+10*i, canvas.height * 0.03);
+  }
 
 
   if (!gameStarted) {
@@ -469,6 +472,7 @@ canvas.addEventListener("click", (event) => {
     bullets = 0
   };
   bullettext = "Amount of bullets " + bullets;
+
   console.log(bullets);
   hasShot = true;
 
