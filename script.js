@@ -43,7 +43,7 @@ const dogIdle = new Image();
 dogIdle.src = "./CANVASAPI_UI/dogidle.png";
 
 const bulletImage = new Image();
-bulletImage.src = "./CANVASAPI_UI/bullet.png"
+bulletImage.src = "./CANVASAPI_UI/bullet.png";
 
 let bullets = 10;
 let bullettext = "Amount of bullets " + 10;
@@ -84,7 +84,7 @@ window.onload = () => {
 
   // Start Game -nappulan klikkaus
   document.getElementById("startGameButton").addEventListener("click", () => {
-    canvas.style.cursor="none";
+    canvas.style.cursor = "none";
 
     gameStarted = true;
     document.getElementById("startGameDiv").style.display = "none";
@@ -239,7 +239,7 @@ class Duck {
 
     this.directionChangeCounter++;
     if (
-      this.directionChangeCounter >= this.directionChangeInterval ||
+      this.directionChangeCounter >= this.directionChangeInterval || 
       hitWall
     ) {
       this.directionChangeCounter = 0;
@@ -303,7 +303,6 @@ class Duck {
 }
 
 class Dog {
-  // Kesken
   constructor(x, y, speed, spriteSheet) {
     this.spriteSheet = spriteSheet;
     this.spriteWidth = 69;
@@ -312,20 +311,24 @@ class Dog {
     this.x = x;
     this.y = y;
     this.dx = speed;
-
-    this.frameIndex = 1;
+    
+    this.frameIndex = 0;
     this.frameCount = 5;
     this.frameInterval = 10;
     this.frameCounter = 0;
-
     this.spriteSheetY = 0;
-
-    this.draw();
+    
+    this.idleFrameIndex = 0;
+    this.idleFrameCount = 2;
+    this.idleFrameInterval = 10;
+    this.idleFrameCounter = 0;
+    this.idleCycles = 0;
+    this.maxIdleCycles = 2;
+    this.visible = true;
   }
-
+  
   draw() {
     let spriteSheetX = this.frameIndex * this.spriteWidth;
-
     if (this.dx < 0) {
       context.save();
       context.translate(this.x + this.spriteWidth * 3, this.y);
@@ -356,31 +359,50 @@ class Dog {
       );
     }
   }
-
+  
   drawIdle() {
+    if (!this.visible) return;
+
+    let frameWidth = this.spriteWidth;
+    let sx = this.idleFrameIndex * frameWidth;
+    let sy = 0;
+
     context.drawImage(
       dogIdle,
-      this.x,
-      this.y,
-      this.spriteWidth * 3,
-      this.spriteHeight * 3
+      sx, sy, frameWidth, this.spriteHeight,
+      this.x, this.y,
+      this.spriteWidth * 3, this.spriteHeight * 3
     );
   }
-
+  
   update() {
-    if (this.x < 0 || this.x + this.spriteWidth * 3 > canvas.width) {
+    if (this.x <= 0 || this.x + this.spriteWidth * 4 >= canvas.width) {
       this.dx *= -1;
     }
-
     this.x += this.dx;
-
     this.frameCounter++;
     if (this.frameCounter >= this.frameInterval) {
       this.frameCounter = 0;
       this.frameIndex = (this.frameIndex + 1) % this.frameCount;
     }
-
     this.draw();
+  }
+  
+  updateIdle() {
+    if (!this.visible) return;
+    this.idleFrameCounter++;
+    if (this.idleFrameCounter >= this.idleFrameInterval) {
+      this.idleFrameCounter = 0;
+      this.idleFrameIndex++;
+      if (this.idleFrameIndex >= this.idleFrameCount) {
+        this.idleFrameIndex = 0;
+        this.idleCycles++;
+        if (this.idleCycles >= this.maxIdleCycles) {
+          this.visible = false;
+        }
+      }
+    }
+    this.drawIdle();
   }
 }
 
@@ -440,46 +462,40 @@ let animateFrame = function () {
   deadDucks.forEach((element) => {
     element.updateDeads();
   });
-
+  
   context.drawImage(background, 0, 110, window.innerWidth, window.innerHeight);
   context.font = "38px Arial";
   context.fillStyle = "White";
   context.textAlign = "right";
   context.fillText(scoreCount, canvas.width - 20, 40);
   context.fillText(bullettext, canvas.width * 0.20, canvas.height * 0.05);
-
+  
   for (let i = 1; i <= bullets; i++) {
     context.drawImage(bulletImage, canvas.width * 0.2 + 50 + 10 * i, canvas.height * 0.03);
   }
 
-
   if (!gameStarted) {
-    dog.drawIdle();
-  }
-
-  if (gameStarted) {
     dog.update();
+
+  } else {
+    dog.updateIdle();
     var targeredDucks = ducks.filter((duck) =>
-      target.x+123 >= duck.x &&
-      target.x+123 <= duck.x + duckWidth &&
-      target.y+123 >= duck.y &&
-      target.y+123 <= duck.y + duckHeight
-
-
+      target.x + 123 >= duck.x &&
+      target.x + 123 <= duck.x + duckWidth &&
+      target.y + 123 >= duck.y &&
+      target.y + 123 <= duck.y + duckHeight
     );
-
-
-
-
-    if (targeredDucks.length > 0) {
-
-      context.drawImage(target.spriteTargetImageRed, target.x, target.y);
-    }
-    else {
-      context.drawImage(target.spriteTargetImage, target.x, target.y);
-
-    }
   }
+  
+  if (targeredDucks.length > 0) {
+
+    context.drawImage(target.spriteTargetImageRed, target.x, target.y);
+  } 
+  else {
+    context.drawImage(target.spriteTargetImage, target.x, target.y);
+
+  }
+  
   if (bullets > 0) {
     if (hasShot && shotCooldown === 0) {
       if (flashDuration > 0) {
@@ -515,9 +531,9 @@ canvas.addEventListener("click", (event) => {
 
   console.log("Shot at: ", x, y);
   bullets -= 1;
-  if (0 > bullets) {
-    bullets = 0
-  };
+  if (bullets < 0) {
+    bullets = 0;
+  }
   bullettext = "Amount of bullets " + bullets;
 
   console.log(bullets);
