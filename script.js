@@ -84,6 +84,8 @@ window.onload = () => {
 
   // Start Game -nappulan klikkaus
   document.getElementById("startGameButton").addEventListener("click", () => {
+    canvas.style.cursor="none";
+
     gameStarted = true;
     document.getElementById("startGameDiv").style.display = "none";
     startDuckSpawnCounter();
