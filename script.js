@@ -15,6 +15,8 @@ export let isPaused = false;
 export let canvas = document.getElementById("gameCanvas");
 export let context = canvas.getContext("2d");
 
+
+
 let SHOT_COOLDOWN_INTERVAL = 100;
 let SHOT_COOLDOWN_COUNTER = 0;
 let DUCK_SPAWN_INTERVAL = 100;
@@ -94,6 +96,7 @@ window.onload = () => {
     document.getElementById("gameOverDiv").style.display = "none";
     startDuckSpawnCounter();
   });
+  
 
   context.drawImage(background, 0, 0, window.innerWidth, window.innerHeight);
   context.drawImage(background2, 0, 0, window.innerWidth, window.innerHeight);
@@ -234,7 +237,7 @@ canvas.addEventListener("click", (event) => {
   if (!gameStarted) return;
   if (ducksAlive === 0) return;
   if (hasShot) return;
-  if (bullets === 0) return;
+
   let rect = canvas.getBoundingClientRect();
   let x = event.clientX - rect.left;
   let y = event.clientY - rect.top;
@@ -247,6 +250,14 @@ canvas.addEventListener("click", (event) => {
 
   console.log(bullets);
   hasShot = true;
+
+  // Add the check for game over when bullets are 0
+  if (bullets === 0) {
+    document.getElementById("gameOverDiv").style.display = "block";
+    document.getElementById("restartButton").onclick = function(){
+      window.location.reload();
+    };
+  }
 
   startShotCooldownCounter();
   var duckshuted = false;
@@ -293,6 +304,7 @@ canvas.addEventListener("click", (event) => {
     dog.frameCounter = 0;
   }
 });
+
 
 document.addEventListener("keydown", (event) => {
   if (event.key === "p" || event.key === "P") {
