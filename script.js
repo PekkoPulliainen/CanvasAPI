@@ -190,6 +190,7 @@ let animateFrame = function () {
     dog.update();
   } else {
     dog.updateIdle();
+    dog.updatesmiling(); 
   }
   let targetedDucks = [];
   if (gameStarted) {
@@ -246,9 +247,10 @@ canvas.addEventListener("click", (event) => {
   hasShot = true;
 
   startShotCooldownCounter();
-
+  var duckshuted=false;
   for (let i = 0; i < ducks.length; i++) {
     if (isDuckClicked(x, y, ducks[i])) {
+      duckshuted=true;
       ducks[i].frameCounter = 0;
       ducks[i].frameIndex = 0;
       console.log(ducks[i]);
@@ -267,6 +269,15 @@ canvas.addEventListener("click", (event) => {
       break;
     }
   }
+  if (!duckshuted&&dog.smiling==="none")
+    {
+      dog.smiling="plus";
+      dog.y=canvas.height * 0.71+60;
+      dog.x=x;
+      dog.frameIndex=0;
+      dog.frameCounter=0;
+    }
+
 });
 
 document.addEventListener("keydown", (event) => {

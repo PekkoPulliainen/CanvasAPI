@@ -23,6 +23,11 @@ export class Dog {
     this.idleCycles = 0;
     this.maxIdleCycles = 2;
     this.visible = true;
+    this.smiling = "none";
+
+    this.doglaugh = new Image();
+    this.doglaugh.src = "./CANVASAPI_UI/doglaugh1.png";
+
   }
 
   draw() {
@@ -106,5 +111,30 @@ export class Dog {
       }
     }
     this.drawIdle();
+  }
+
+  updatesmiling() {
+    if (this.smiling === "none") return;
+    if (this.smiling === "plus") {
+      this.y -= 1;
+      this.frameCounter++;
+
+
+    }
+    else {
+      this.frameCounter--;
+      this.y += 1;
+    }
+
+    context.drawImage(
+      this.doglaugh, 0, 0, 65, this.frameCounter,
+      this.x, this.y, 65, this.frameCounter
+    );
+    if (this.frameCounter > 90) {
+      this.smiling = "minus";
+    }
+    if (this.frameCounter == 0) {
+      this.smiling = "none";
+    }
   }
 }
