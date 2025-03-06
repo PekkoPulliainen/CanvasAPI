@@ -24,15 +24,15 @@ export class Dog {
     this.maxIdleCycles = 2;
     this.visible = true;
 
-
-    
     this.captured = false;
+    this.captured2 = false;
     this.showdog = "none";
     this.dogduck = new Image();
     this.dogduck.src = "./CANVASAPI_UI/dogduck1.png";
+    this.dogduck2 = new Image();
+    this.dogduck2.src = "./CANVASAPI_UI/dogduck2.png";
     this.doglaugh = new Image();
     this.doglaugh.src = "./CANVASAPI_UI/doglaugh1.png";
-
   }
 
   draw() {
@@ -120,34 +120,57 @@ export class Dog {
 
   updateshowdog() {
     if (this.showdog === "none") return;
-    if (deadDucks.length>0&& this.captured) return;
+    if (deadDucks.length > 0 && this.captured) return;
     if (this.showdog === "plus") {
       this.y -= 1;
       this.frameCounter++;
-
-
-    }
-    else {
+    } else {
       this.frameCounter--;
       this.y += 1;
     }
     if (this.captured)
       context.drawImage(
-        this.dogduck, 0, 0, 100, this.frameCounter,
-        this.x, this.y, 100, this.frameCounter
+        this.dogduck,
+        0, // spriteSheetX
+        0, // spriteSheetY
+        100, // spriteWidth
+        this.frameCounter, // spriteHeight
+        this.x, // dx: Draws the image at 'this.x' on the canvas
+        this.y, // dy: Draws the image at 'this.y' on the canvas
+        100, // dWidth: Width of the drawn image
+        this.frameCounter // dHeight: Height of the drawn image
       );
-      else
-
-    context.drawImage(
-      this.doglaugh, 0, 0, 65, this.frameCounter,
-      this.x, this.y, 65, this.frameCounter
-    );
+    else if (this.captured2)
+      context.drawImage(
+        this.dogduck2,
+        0,
+        0,
+        130,
+        this.frameCounter,
+        this.x,
+        this.y,
+        100,
+        this.frameCounter
+      );
+    else
+      context.drawImage(
+        this.doglaugh,
+        0,
+        0,
+        65,
+        this.frameCounter,
+        this.x,
+        this.y,
+        65,
+        this.frameCounter
+      );
     if (this.frameCounter > 90) {
       this.showdog = "minus";
     }
     if (this.frameCounter == 0) {
       this.showdog = "none";
-      this.captured=false;
+      this.captured = false;
+      this.captured2 = false;
     }
   }
 }

@@ -140,7 +140,7 @@ function startDuckSpawnCounter() {
 }
 
 function duckSpawn() {
-  duckCount += 1;
+  duckCount += 200; // Increase duck count by 5 for each round
   for (let i = 0; i < duckCount; i++) {
     let x = canvasWidth / 2 - DUCK_WIDTH / 2;
     let y = canvasHeight - DUCK_HEIGHT - 150;
@@ -189,7 +189,7 @@ let animateFrame = function () {
     dog.update();
   } else {
     dog.updateIdle();
-    dog.updateshowdog(); 
+    dog.updateshowdog();
   }
   let targetedDucks = [];
   if (gameStarted) {
@@ -232,11 +232,14 @@ canvas.addEventListener("mousemove", (event) => {
 canvas.addEventListener("click", (event) => {
   if (isPaused) return;
   if (!gameStarted) return;
+  if (ducksAlive === 0) return;
   if (hasShot) return;
   if (bullets === 0) return;
   let rect = canvas.getBoundingClientRect();
   let x = event.clientX - rect.left;
   let y = event.clientY - rect.top;
+  let doubleKill = false;
+  let twoWithOne = 0;
 
   console.log("Shot at: ", x, y);
   bullets -= 1;
@@ -246,10 +249,12 @@ canvas.addEventListener("click", (event) => {
   hasShot = true;
 
   startShotCooldownCounter();
-  var duckshuted=false;
-  for (let i = 0; i < ducks.length; i++) {
+  var duckshuted = false;
+  for (let i = ducks.length - 1; i >= 0; i--) {
+    // loop backwards to avoid skipping ducks
     if (isDuckClicked(x, y, ducks[i])) {
-      duckshuted=true;
+      twoWithOne += 1;
+      duckshuted = true;
       ducks[i].frameCounter = 0;
       ducks[i].frameIndex = 0;
       console.log(ducks[i]);
@@ -259,33 +264,34 @@ canvas.addEventListener("click", (event) => {
       bulletAudio.currentTime = 0;
       bulletAudio.play();
       ducksAlive -= 1;
-      if (ducksAlive === 0) {
-        startDuckSpawnCounter();
-        bullets = 10;
-        bulletText = "Amount of bullets " + bullets;
-      }
-
-      break;
+    }
+    if (twoWithOne > 1) {
+      doubleKill = true;
     }
   }
-  if (!duckshuted&&dog.showdog==="none")
-    {
-      dog.showdog="plus";
-      dog.y=canvas.height * 0.71+60;
-      dog.x=x;
-      dog.frameIndex=0;
-      dog.frameCounter=0;
-    }
-  if (duckshuted&&dog.showdog==="none")
-    {
-      dog.showdog="plus";
-      dog.captured=true;
-      dog.y=canvas.height * 0.71+60;
-      dog.x=x;
-      dog.frameIndex=0;
-      dog.frameCounter=0;
-    }    
 
+  if (ducksAlive === 0) {
+    startDuckSpawnCounter();
+    bullets = 10;
+    bulletText = "Amount of bullets " + bullets;
+  }
+
+  if (!duckshuted && dog.showdog === "none") {
+    dog.showdog = "plus";
+    dog.y = canvas.height * 0.71 + 60;
+    dog.x = x;
+    dog.frameIndex = 0;
+    dog.frameCounter = 0;
+  }
+  if (duckshuted && dog.showdog === "none") {
+    dog.showdog = "plus";
+    if (!doubleKill) dog.captured = true;
+    else dog.captured2 = true;
+    dog.y = canvas.height * 0.71 + 60;
+    dog.x = x;
+    dog.frameIndex = 0;
+    dog.frameCounter = 0;
+  }
 });
 
 document.addEventListener("keydown", (event) => {

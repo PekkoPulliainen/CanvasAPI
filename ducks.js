@@ -135,7 +135,7 @@ export class Duck {
     // Consider diagonal if vertical movement is at least 40% of horizontal movement
     this.diagonal = verticalMovement > horizontalMovement * 0.4;
 
-    console.log(`Diagonal: ${this.diagonal}, dx: ${dx}, dy: ${dy}`);
+    // console.log(`Diagonal: ${this.diagonal}, dx: ${dx}, dy: ${dy}`);
 
     this.frameCounter++;
     if (this.frameCounter >= this.frameInterval) {
