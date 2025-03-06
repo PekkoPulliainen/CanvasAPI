@@ -27,8 +27,9 @@ let canvasHeight = window.innerHeight;
 function resizeCanvas() {
   canvasWidth = window.innerWidth;
   canvasHeight = window.innerHeight;
-  canvas.width = canvasWidth;
-  canvas.height = canvasHeight;
+  canvas.width = canvasWidth * window.devicePixelRatio;
+  canvas.height = canvasHeight * window.devicePixelRatio;
+  context.scale(window.devicePixelRatio, window.devicePixelRatio);
 }
 
 window.addEventListener("resize", resizeCanvas);
@@ -48,7 +49,7 @@ const bulletImage = new Image();
 bulletImage.src = "./CANVASAPI_UI/bullet.png";
 
 let bullets = 10;
-let bullettext = "Amount of bullets " + 10;
+let bulletText = "Amount of bullets " + 10;
 
 const background2 = new Image();
 background2.src = "./CANVASAPI_UI/background-new-3.png";
@@ -64,8 +65,6 @@ spriteSheetMirrored.src = "./CANVASAPI_UI/sprites-remake-mirrored.png";
 const target = {
   spriteTargetImage: new Image(),
   spriteTargetImageRed: new Image(),
-  x: 0,
-  y: 0,
 };
 target.spriteTargetImage.src = "./CANVASAPI_UI/target.png";
 target.spriteTargetImageRed.src = "./CANVASAPI_UI/targetRed.png";
@@ -176,7 +175,7 @@ let animateFrame = function () {
   context.fillStyle = "White";
   context.textAlign = "right";
   context.fillText(scoreCount, canvasWidth - 20, 40);
-  context.fillText(bullettext, canvasWidth * 0.2, canvasHeight * 0.05);
+  context.fillText(bulletText, canvasWidth * 0.2, canvasHeight * 0.05);
 
   for (let i = 1; i <= bullets; i++) {
     context.drawImage(
@@ -203,9 +202,9 @@ let animateFrame = function () {
   }
 
   if (targetedDucks.length > 0) {
-    context.drawImage(target.spriteTargetImageRed, target.x, target.y);
+    context.drawImage(target.spriteTargetImageRed, target.x, target.y, 90, 90);
   } else {
-    context.drawImage(target.spriteTargetImage, target.x, target.y);
+    context.drawImage(target.spriteTargetImage, target.x, target.y, 90, 90);
   }
 
   if (bullets > 0) {
@@ -225,8 +224,8 @@ canvas.addEventListener("mousemove", (event) => {
   if (!gameStarted) return;
 
   let rect = canvas.getBoundingClientRect();
-  target.x = event.clientX - rect.left - 123;
-  target.y = event.clientY - rect.top - 123;
+  target.x = (event.clientX - rect.left) * (canvas.width / rect.width) - 45;
+  target.y = (event.clientY - rect.top) * (canvas.height / rect.height) - 45;
 });
 
 canvas.addEventListener("click", (event) => {
@@ -240,7 +239,7 @@ canvas.addEventListener("click", (event) => {
 
   console.log("Shot at: ", x, y);
   bullets -= 1;
-  bullettext = "Amount of bullets " + bullets;
+  bulletText = "Amount of bullets " + bullets;
 
   console.log(bullets);
   hasShot = true;
@@ -261,7 +260,7 @@ canvas.addEventListener("click", (event) => {
       if (ducksAlive === 0) {
         startDuckSpawnCounter();
         bullets = 10;
-        bullettext = "Amount of bullets " + bullets;
+        bulletText = "Amount of bullets " + bullets;
       }
 
       break;

@@ -10,44 +10,51 @@ import { DUCK_WIDTH, DUCK_HEIGHT } from "./constants.js";
 
 export class Duck {
   constructor(x, y, count, speed) {
-    this.spriteSheet = spriteSheet;
-    this.spriteWidth = 40;
-    this.spriteHeight = 40;
-    this.spriteSheetY = 146 + count * this.spriteHeight;
-    this.x = x;
-    this.y = y;
-    this.speed = speed + 5;
-    this.diagonal = true;
-    this.hitWall = false;
-    console.log("speed: " + this.speed);
-    this.dx = Math.random() < 0.5 ? 1 : -1;
-    this.dy = (Math.random() - 0.5) * 0.2;
-    this.dy = 1;
-    this.frameIndex = 0;
-    this.frameCount = 3;
-    this.frameInterval = 8;
-    this.frameCounter = 0;
-    this.directionChangeCounter = 0;
-    this.directionChangeInterval = 700;
-    this.deadDelayCounter = 0;
-    this.speedChangeCounter = 0;
-    this.speedChangeInterval = 300;
+    // Initializes the Duck class with the x-coordinate, y-coordinate, count, and speed parameters.
+    this.spriteSheet = spriteSheet; // Initializes the sprite sheet for the duck.
+    this.spriteWidth = 40; // Sets the width of the duck's sprite.
+    this.spriteHeight = 40; // Sets the height of the duck's sprite.
+    this.spriteSheetY = 146 + count * this.spriteHeight; // Sets the y-coordinate of the duck's sprite sheet.
+    this.x = x; // Initializes the x-coordinate of the duck.
+    this.y = y; // Initializes the y coordinate of the duck.
+    this.speed = speed + 5; // Initializes the speed of the duck.
+    this.diagonal = true; // Initializes the diagonal property to true, indicating the duck is moving diagonally.
+    this.duckTargetX = this.getRandomTargetX(); // Sets a random target x-coordinate for the duck to move towards.
+    this.duckTargetY = this.getRandomTargetY(); // Sets a random target y-coordinate for the duck to move towards.
+    console.log("speed: " + this.speed); // Logs the speed of the duck to the console for debugging purposes.
+    this.frameCount = 3; // Sets the number of frames for the duck's animation.
+    this.frameInterval = 8; // Sets the interval between frames for the duck's animation.
+    this.frameCounter = 0; // Initializes the frame counter to 0.
+    this.deadDelayCounter = 0; // Initializes the dead delay counter to 0.
+    this.frameIndex = Math.floor(Math.random() * 4); // Randomly selects a starting frame index for the duck's animation.
 
-    this.draw();
+    this.draw(); // Calls the draw method to render the duck on the canvas.
+  }
+
+  getRandomTargetX() {
+    // Generates a random target x-coordinate for the duck to move
+    let targetX;
+    do {
+      targetX = Math.random() * (canvas.width - DUCK_WIDTH);
+    } while (Math.abs(targetX - this.x) < DUCK_WIDTH * 2);
+    return targetX;
+  }
+
+  getRandomTargetY() {
+    // Generates a random target y-coordinate for the duck to move
+    let targetY;
+    do {
+      targetY = Math.random() * (canvas.height - DUCK_HEIGHT - 100);
+    } while (Math.abs(targetY - this.y) < DUCK_HEIGHT * 2);
+    return targetY;
   }
 
   draw() {
     let spriteSheetX = this.frameIndex * this.spriteWidth;
     let spriteSheetY = this.spriteSheetY;
 
-    if (this.dx !== 0 && Math.abs(this.dy) > 0.1) {
-      this.diagonal = true;
-    } else {
-      this.diagonal = false;
-    }
-
-    if (this.dx < 0) {
-      if (this.diagonal === false) {
+    if (this.x > this.duckTargetX) {
+      if (!this.diagonal) {
         context.translate(this.x + DUCK_WIDTH, this.y);
         context.scale(-1, 1);
         context.drawImage(
@@ -75,10 +82,11 @@ export class Duck {
           DUCK_WIDTH,
           DUCK_HEIGHT
         );
+        context.restore();
       }
       context.setTransform(1, 0, 0, 1, 0, 0);
     } else {
-      if (this.diagonal === false) {
+      if (!this.diagonal) {
         context.drawImage(
           this.spriteSheet,
           spriteSheetX,
@@ -107,71 +115,40 @@ export class Duck {
   }
 
   update() {
-    this.hitWall = false;
+    let dx = this.duckTargetX - this.x;
+    let dy = this.duckTargetY - this.y;
+    let distance = Math.sqrt(dx * dx + dy * dy);
 
-    if (this.x < 0) {
-      this.dx = Math.abs(this.dx); // Move right
-      this.x = 1; // Adjust position
-      this.hitWall = true;
-    } else if (this.x + DUCK_WIDTH > canvas.width) {
-      this.dx = -Math.abs(this.dx); // Move left
-      this.x = canvas.width - DUCK_WIDTH - 1; // Adjust position
-      this.hitWall = true;
+    if (distance < this.speed) {
+      this.x = this.duckTargetX;
+      this.y = this.duckTargetY;
+      this.duckTargetX = this.getRandomTargetX();
+      this.duckTargetY = this.getRandomTargetY();
+    } else {
+      this.x += (dx / distance) * this.speed;
+      this.y += (dy / distance) * this.speed;
     }
 
-    if (this.y < 0) {
-      this.dy = Math.abs(this.dy); // Move down
-      this.y = 1; // Adjust position
-      this.hitWall = true;
-    } else if (this.y + DUCK_HEIGHT > canvas.height - 90) {
-      this.dy = -Math.abs(this.dy); // Move up
-      this.y = canvas.height - DUCK_HEIGHT - 91; // Adjust position
-      this.hitWall = true;
-    }
+    let horizontalMovement = Math.abs(dx); // Calculate the absolute value of the horizontal movement.
+    let verticalMovement = Math.abs(dy); // Calculate the absolute value of the vertical movement.
 
-    this.x += this.dx * this.speed;
-    this.y += this.dy * this.speed;
+    // Consider diagonal if vertical movement is at least 40% of horizontal movement
+    this.diagonal = verticalMovement > horizontalMovement * 0.4;
+
+    console.log(`Diagonal: ${this.diagonal}, dx: ${dx}, dy: ${dy}`);
 
     this.frameCounter++;
     if (this.frameCounter >= this.frameInterval) {
       this.frameCounter = 0;
       this.frameIndex = (this.frameIndex + 1) % this.frameCount;
     }
-    if (ducksAlive > 0) {
-      this.directionChangeCounter++;
-    }
-    if (
-      this.directionChangeCounter >= this.directionChangeInterval ||
-      this.hitWall
-    ) {
-      this.directionChangeCounter = 0;
-      this.changeDirection();
-    }
-
-    if (ducksAlive > 0) {
-      this.speedChangeCounter++;
-    }
-    if (this.speedChangeCounter >= this.speedChangeInterval) {
-      this.speedChangeCounter = 0;
-      this.changeSpeed();
-    }
 
     this.draw();
   }
 
   changeSpeed() {
-    this.speed = 7 + Math.random() * 4;
+    this.speed = 5 + Math.random() * 4;
     console.log("new speed: " + this.speed);
-  }
-
-  changeDirection() {
-    if (Math.random() < 0.67) {
-      this.dx = Math.random() < 0.5 ? 1 : -1;
-      this.dy = Math.random() < 0.5 ? 1 : -1;
-    } else {
-      this.dx = Math.random() < 0.5 ? 1 : -1;
-      this.dy = (Math.random() - 0.5) * 0.2;
-    }
   }
 
   updateDeads() {
