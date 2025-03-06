@@ -44,6 +44,12 @@ const Score = document.getElementById("Score");
 export const dogIdle = new Image();
 dogIdle.src = "./CANVASAPI_UI/dogidle.png";
 
+const bulletImage = new Image();
+bulletImage.src = "./CANVASAPI_UI/bullet.png";
+
+let bullets = 10;
+let bullettext = "Amount of bullets " + 10;
+
 const background2 = new Image();
 background2.src = "./CANVASAPI_UI/background-new-3.png";
 
@@ -54,6 +60,15 @@ export const spriteSheet = new Image();
 spriteSheet.src = "./CANVASAPI_UI/sprites-remake.png";
 const spriteSheetMirrored = new Image();
 spriteSheetMirrored.src = "./CANVASAPI_UI/sprites-remake-mirrored.png";
+
+const target = {
+  spriteTargetImage: new Image(),
+  spriteTargetImageRed: new Image(),
+  x: 0,
+  y: 0,
+};
+target.spriteTargetImage.src = "./CANVASAPI_UI/target.png";
+target.spriteTargetImageRed.src = "./CANVASAPI_UI/targetRed.png";
 
 canvas.style.backgroundColor = "rgb(51, 117, 192)";
 
@@ -67,6 +82,8 @@ window.onload = () => {
 
   // Start Game -nappulan klikkaus
   document.getElementById("startGameButton").addEventListener("click", () => {
+    canvas.style.cursor = "none";
+
     gameStarted = true;
     document.getElementById("startGameDiv").style.display = "none";
     startDuckSpawnCounter();
@@ -97,6 +114,19 @@ function isDuckClicked(x, y, duck) {
   );
 }
 
+function startShotCooldownCounter() {
+  console.log("reloading...");
+  SHOT_COOLDOWN_INTERVAL = setInterval(() => {
+    if (isPaused) return;
+    SHOT_COOLDOWN_COUNTER++;
+    if (SHOT_COOLDOWN_COUNTER === 25) {
+      hasShot = false;
+      clearInterval(SHOT_COOLDOWN_INTERVAL);
+      SHOT_COOLDOWN_COUNTER = 0;
+    }
+  }, 100);
+}
+
 function startDuckSpawnCounter() {
   console.log("next round in 3.5 seconds...");
   DUCK_SPAWN_INTERVAL = setInterval(() => {
@@ -106,19 +136,6 @@ function startDuckSpawnCounter() {
       clearInterval(DUCK_SPAWN_INTERVAL);
       DUCK_SPAWN_COUNTER = 0;
       duckSpawn();
-    }
-  }, 100);
-}
-
-function startSHOT_COOLDOWN_COUNTERCounter() {
-  console.log("reloading...");
-  SHOT_COOLDOWN_INTERVAL = setInterval(() => {
-    if (isPaused) return;
-    SHOT_COOLDOWN_COUNTER++;
-    if (SHOT_COOLDOWN_COUNTER === 25) {
-      hasShot = false;
-      clearInterval(SHOT_COOLDOWN_INTERVAL);
-      SHOT_COOLDOWN_COUNTER = 0;
     }
   }, 100);
 }
@@ -159,39 +176,76 @@ let animateFrame = function () {
   context.fillStyle = "White";
   context.textAlign = "right";
   context.fillText(scoreCount, canvasWidth - 20, 40);
+  context.fillText(bullettext, canvasWidth * 0.2, canvasHeight * 0.05);
+
+  for (let i = 1; i <= bullets; i++) {
+    context.drawImage(
+      bulletImage,
+      canvasWidth * 0.2 + 50 + 10 * i,
+      canvasHeight * 0.03
+    );
+  }
 
   if (!gameStarted) {
-    dog.drawIdle();
-  }
-
-  if (gameStarted) {
     dog.update();
+  } else {
+    dog.updateIdle();
+  }
+  let targetedDucks = [];
+  if (gameStarted) {
+    targetedDucks = ducks.filter(
+      (Duck) =>
+        target.x + 123 >= Duck.x &&
+        target.x + 123 <= Duck.x + DUCK_WIDTH &&
+        target.y + 123 >= Duck.y &&
+        target.y + 123 <= Duck.y + DUCK_HEIGHT
+    );
   }
 
-  if (hasShot && SHOT_COOLDOWN_COUNTER === 0) {
-    if (FLASH_DURATION > 0) {
-      context.fillStyle = "rgba(255, 255, 255," + FLASH_DURATION / 10 + ")";
-      context.fillRect(0, 0, canvasWidth, canvasHeight);
-      FLASH_DURATION--;
-    } else {
-      FLASH_DURATION = 10;
+  if (targetedDucks.length > 0) {
+    context.drawImage(target.spriteTargetImageRed, target.x, target.y);
+  } else {
+    context.drawImage(target.spriteTargetImage, target.x, target.y);
+  }
+
+  if (bullets > 0) {
+    if (hasShot && SHOT_COOLDOWN_COUNTER === 0) {
+      if (FLASH_DURATION > 0) {
+        context.fillStyle = "rgba(255, 255, 255," + FLASH_DURATION / 10 + ")";
+        context.fillRect(0, 0, canvasWidth, canvasHeight);
+        FLASH_DURATION--;
+      } else {
+        FLASH_DURATION = 10;
+      }
     }
   }
 };
+canvas.addEventListener("mousemove", (event) => {
+  if (isPaused) return;
+  if (!gameStarted) return;
+
+  let rect = canvas.getBoundingClientRect();
+  target.x = event.clientX - rect.left - 123;
+  target.y = event.clientY - rect.top - 123;
+});
 
 canvas.addEventListener("click", (event) => {
   if (isPaused) return;
   if (!gameStarted) return;
   if (hasShot) return;
+  if (bullets === 0) return;
   let rect = canvas.getBoundingClientRect();
   let x = event.clientX - rect.left;
   let y = event.clientY - rect.top;
 
   console.log("Shot at: ", x, y);
+  bullets -= 1;
+  bullettext = "Amount of bullets " + bullets;
 
+  console.log(bullets);
   hasShot = true;
 
-  startSHOT_COOLDOWN_COUNTERCounter();
+  startShotCooldownCounter();
 
   for (let i = 0; i < ducks.length; i++) {
     if (isDuckClicked(x, y, ducks[i])) {
@@ -206,6 +260,8 @@ canvas.addEventListener("click", (event) => {
       ducksAlive -= 1;
       if (ducksAlive === 0) {
         startDuckSpawnCounter();
+        bullets = 10;
+        bullettext = "Amount of bullets " + bullets;
       }
 
       break;
