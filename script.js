@@ -145,7 +145,7 @@ function duckSpawn() {
   for (let i = 0; i < duckCount; i++) {
     let x = canvasWidth / 2 - DUCK_WIDTH / 2;
     let y = canvasHeight - DUCK_HEIGHT - 150;
-    let duck = new Duck(x, y, color, 2);
+    let duck = new Duck(x, y, color, 1);
     color += 1;
     if (i % 3 == 0) {
       color = 0;
@@ -190,7 +190,7 @@ let animateFrame = function () {
     dog.update();
   } else {
     dog.updateIdle();
-    dog.updatesmiling(); 
+    dog.updateshowdog(); 
   }
   let targetedDucks = [];
   if (gameStarted) {
@@ -269,14 +269,23 @@ canvas.addEventListener("click", (event) => {
       break;
     }
   }
-  if (!duckshuted&&dog.smiling==="none")
+  if (!duckshuted&&dog.showdog==="none")
     {
-      dog.smiling="plus";
+      dog.showdog="plus";
       dog.y=canvas.height * 0.71+60;
       dog.x=x;
       dog.frameIndex=0;
       dog.frameCounter=0;
     }
+  if (duckshuted&&dog.showdog==="none")
+    {
+      dog.showdog="plus";
+      dog.captured=true;
+      dog.y=canvas.height * 0.71+60;
+      dog.x=x;
+      dog.frameIndex=0;
+      dog.frameCounter=0;
+    }    
 
 });
 
