@@ -28,11 +28,10 @@ export class Duck {
     this.deadDelayCounter = 0; // Initializes the dead delay counter to 0.
     this.frameIndex = Math.floor(Math.random() * 4); // Randomly selects a starting frame index for the duck's animation.
 
-    this.draw(); // Calls the draw method to render the duck on the canvas.
+    this.draw(); 
   }
 
   getRandomTargetX() {
-    // Generates a random target x-coordinate for the duck to move
     let targetX;
     do {
       targetX = Math.random() * (canvas.width - DUCK_WIDTH);
@@ -41,7 +40,6 @@ export class Duck {
   }
 
   getRandomTargetY() {
-    // Generates a random target y-coordinate for the duck to move
     let targetY;
     do {
       targetY = Math.random() * (canvas.height - DUCK_HEIGHT - 100);
@@ -129,13 +127,11 @@ export class Duck {
       this.y += (dy / distance) * this.speed;
     }
 
-    let horizontalMovement = Math.abs(dx); // Calculate the absolute value of the horizontal movement.
-    let verticalMovement = Math.abs(dy); // Calculate the absolute value of the vertical movement.
+    let horizontalMovement = Math.abs(dx); 
+    let verticalMovement = Math.abs(dy); 
 
-    // Consider diagonal if vertical movement is at least 40% of horizontal movement
     this.diagonal = verticalMovement > horizontalMovement * 0.4;
 
-    // console.log(`Diagonal: ${this.diagonal}, dx: ${dx}, dy: ${dy}`);
 
     this.frameCounter++;
     if (this.frameCounter >= this.frameInterval) {

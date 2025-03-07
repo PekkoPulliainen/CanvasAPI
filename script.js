@@ -238,6 +238,10 @@ canvas.addEventListener("click", (event) => {
   if (ducksAlive === 0) return;
   if (hasShot) return;
 
+  if (bullets <= 0) {
+    return;  
+  }
+
   let rect = canvas.getBoundingClientRect();
   let x = event.clientX - rect.left;
   let y = event.clientY - rect.top;
@@ -245,24 +249,18 @@ canvas.addEventListener("click", (event) => {
   let twoWithOne = 0;
 
   console.log("Shot at: ", x, y);
-  bullets -= 1;
+
+  bullets -= 1;  
   bulletText = "Amount of bullets " + bullets;
 
   console.log(bullets);
   hasShot = true;
 
-  // Add the check for game over when bullets are 0
-  if (bullets === 0) {
-    document.getElementById("gameOverDiv").style.display = "block";
-    document.getElementById("restartButton").onclick = function(){
-      window.location.reload();
-    };
-  }
+  
 
   startShotCooldownCounter();
   var duckshuted = false;
   for (let i = ducks.length - 1; i >= 0; i--) {
-    // loop backwards to avoid skipping ducks
     if (isDuckClicked(x, y, ducks[i])) {
       twoWithOne += 1;
       duckshuted = true;
@@ -281,9 +279,17 @@ canvas.addEventListener("click", (event) => {
     }
   }
 
+  if (bullets === 0) {
+    document.getElementById("finalScore").textContent = scoreCount;
+    document.getElementById("gameOverDiv").style.display = "block";
+    document.getElementById("restartButton").onclick = function(){
+      window.location.reload();
+    };
+  }
+
   if (ducksAlive === 0) {
     startDuckSpawnCounter();
-    bullets = 10;
+    bullets = 10; 
     bulletText = "Amount of bullets " + bullets;
   }
 
@@ -304,6 +310,7 @@ canvas.addEventListener("click", (event) => {
     dog.frameCounter = 0;
   }
 });
+
 
 
 document.addEventListener("keydown", (event) => {
