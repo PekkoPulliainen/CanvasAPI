@@ -50,8 +50,8 @@ dogIdle.src = "./CANVASAPI_UI/dogidle.png";
 const bulletImage = new Image();
 bulletImage.src = "./CANVASAPI_UI/bullet.png";
 
-let bullets = 10;
-let bulletText = "Amount of bullets " + 10;
+let bullets = 9;
+let bulletText = "Amount of bullets: " + bullets;
 
 const background2 = new Image();
 background2.src = "./CANVASAPI_UI/background-new-3.png";
@@ -137,13 +137,17 @@ function startDuckSpawnCounter() {
     if (DUCK_SPAWN_COUNTER >= 35) {
       clearInterval(DUCK_SPAWN_INTERVAL);
       DUCK_SPAWN_COUNTER = 0;
-      duckSpawn();
+      duckSpawn(); 
     }
   }, 100);
 }
 
+
 function duckSpawn() {
-  duckCount += 200; // Increase duck count by 5 for each round
+  duckCount += 5; 
+  bullets = duckCount + 2;
+  bulletText = "Amount of bullets: " + bullets;
+
   for (let i = 0; i < duckCount; i++) {
     let x = canvasWidth / 2 - DUCK_WIDTH / 2;
     let y = canvasHeight - DUCK_HEIGHT - 150;
@@ -152,7 +156,7 @@ function duckSpawn() {
     if (i % 3 == 0) {
       color = 0;
     }
-    ducksAlive = duckCount;
+    ducksAlive = duckCount; 
     ducks.push(duck);
   }
 }
@@ -251,7 +255,7 @@ canvas.addEventListener("click", (event) => {
   console.log("Shot at: ", x, y);
 
   bullets -= 1;  
-  bulletText = "Amount of bullets " + bullets;
+  bulletText = "Amount of bullets: " + bullets;
 
   console.log(bullets);
   hasShot = true;
@@ -279,7 +283,7 @@ canvas.addEventListener("click", (event) => {
     }
   }
 
-  if (bullets === 0) {
+  if (bullets === 0 && ducksAlive > 0) {
     document.getElementById("finalScore").textContent = scoreCount;
     document.getElementById("gameOverDiv").style.display = "block";
     document.getElementById("restartButton").onclick = function(){
@@ -289,8 +293,9 @@ canvas.addEventListener("click", (event) => {
 
   if (ducksAlive === 0) {
     startDuckSpawnCounter();
-    bullets = 10; 
-    bulletText = "Amount of bullets " + bullets;
+    bulletText = "Amount of bullets: " + bullets;
+    
+
   }
 
   if (!duckshuted && dog.showdog === "none") {

@@ -10,23 +10,22 @@ import { DUCK_WIDTH, DUCK_HEIGHT } from "./constants.js";
 
 export class Duck {
   constructor(x, y, count, speed) {
-    // Initializes the Duck class with the x-coordinate, y-coordinate, count, and speed parameters.
-    this.spriteSheet = spriteSheet; // Initializes the sprite sheet for the duck.
-    this.spriteWidth = 40; // Sets the width of the duck's sprite.
-    this.spriteHeight = 40; // Sets the height of the duck's sprite.
-    this.spriteSheetY = 146 + count * this.spriteHeight; // Sets the y-coordinate of the duck's sprite sheet.
-    this.x = x; // Initializes the x-coordinate of the duck.
-    this.y = y; // Initializes the y coordinate of the duck.
-    this.speed = speed + 5; // Initializes the speed of the duck.
-    this.diagonal = true; // Initializes the diagonal property to true, indicating the duck is moving diagonally.
-    this.duckTargetX = this.getRandomTargetX(); // Sets a random target x-coordinate for the duck to move towards.
-    this.duckTargetY = this.getRandomTargetY(); // Sets a random target y-coordinate for the duck to move towards.
-    console.log("speed: " + this.speed); // Logs the speed of the duck to the console for debugging purposes.
-    this.frameCount = 3; // Sets the number of frames for the duck's animation.
-    this.frameInterval = 8; // Sets the interval between frames for the duck's animation.
-    this.frameCounter = 0; // Initializes the frame counter to 0.
-    this.deadDelayCounter = 0; // Initializes the dead delay counter to 0.
-    this.frameIndex = Math.floor(Math.random() * 4); // Randomly selects a starting frame index for the duck's animation.
+    this.spriteSheet = spriteSheet; 
+    this.spriteWidth = 40; 
+    this.spriteHeight = 40; 
+    this.spriteSheetY = 146 + count * this.spriteHeight; 
+    this.x = x; 
+    this.y = y; 
+    this.speed = speed + 5; 
+    this.diagonal = true; 
+    this.duckTargetX = this.getRandomTargetX(); 
+    this.duckTargetY = this.getRandomTargetY(); 
+    console.log("speed: " + this.speed); 
+    this.frameCount = 3; 
+    this.frameInterval = 8; 
+    this.frameCounter = 0; 
+    this.deadDelayCounter = 0; 
+    this.frameIndex = Math.floor(Math.random() * 4); 
 
     this.draw(); 
   }
