@@ -10,24 +10,24 @@ import { DUCK_WIDTH, DUCK_HEIGHT } from "./constants.js";
 
 export class Duck {
   constructor(x, y, count, speed) {
-    this.spriteSheet = spriteSheet; 
-    this.spriteWidth = 40; 
-    this.spriteHeight = 40; 
-    this.spriteSheetY = 146 + count * this.spriteHeight; 
-    this.x = x; 
-    this.y = y; 
-    this.speed = speed + 5; 
-    this.diagonal = true; 
-    this.duckTargetX = this.getRandomTargetX(); 
-    this.duckTargetY = this.getRandomTargetY(); 
-    console.log("speed: " + this.speed); 
-    this.frameCount = 3; 
-    this.frameInterval = 8; 
-    this.frameCounter = 0; 
-    this.deadDelayCounter = 0; 
-    this.frameIndex = Math.floor(Math.random() * 4); 
+    this.spriteSheet = spriteSheet;
+    this.spriteWidth = 40;
+    this.spriteHeight = 40;
+    this.spriteSheetY = 146 + count * this.spriteHeight;
+    this.x = x;
+    this.y = y;
+    this.speed = speed + 5;
+    this.diagonal = true;
+    this.duckTargetX = this.getRandomTargetX();
+    this.duckTargetY = this.getRandomTargetY();
+    console.log("speed: " + this.speed);
+    this.frameCount = 3;
+    this.frameInterval = 8;
+    this.frameCounter = 0;
+    this.deadDelayCounter = 0;
+    this.frameIndex = Math.floor(Math.random() * 4);
 
-    this.draw(); 
+    this.draw();
   }
 
   getRandomTargetX() {
@@ -126,11 +126,10 @@ export class Duck {
       this.y += (dy / distance) * this.speed;
     }
 
-    let horizontalMovement = Math.abs(dx); 
-    let verticalMovement = Math.abs(dy); 
+    let horizontalMovement = Math.abs(dx);
+    let verticalMovement = Math.abs(dy);
 
     this.diagonal = verticalMovement > horizontalMovement * 0.4;
-
 
     this.frameCounter++;
     if (this.frameCounter >= this.frameInterval) {
