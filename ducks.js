@@ -121,6 +121,7 @@ export class Duck {
       this.y = this.duckTargetY;
       this.duckTargetX = this.getRandomTargetX();
       this.duckTargetY = this.getRandomTargetY();
+      this.changeSpeed();
     } else {
       this.x += (dx / distance) * this.speed;
       this.y += (dy / distance) * this.speed;
@@ -141,8 +142,12 @@ export class Duck {
   }
 
   changeSpeed() {
-    this.speed = 5 + Math.random() * 4;
-    console.log("new speed: " + this.speed);
+    if (this.diagonal) {
+      this.speed = 5 + Math.random() * 3;
+    } else {
+      this.speed = 7 + Math.random() * 4;
+    }
+    console.log("Diagonal? " + this.diagonal + " new speed: " + this.speed);
   }
 
   updateDeads() {

@@ -145,7 +145,7 @@ function startDuckSpawnCounter() {
 function duckSpawn() {
   resizeCanvas();
 
-  duckCount += 100;
+  duckCount += 5;
   bullets = duckCount + 2;
   bulletText = "Amount of bullets: " + bullets;
 
@@ -200,11 +200,10 @@ let animateFrame = function () {
   }
 
   if (levelStarted || !gameStarted) dog.updateWalking();
-
-  if (!gameStarted) {
-    /* dog.updateIdle(); */
+  if (!gameStarted && !levelStarted) {
     dog.update();
   }
+  if (dog.bushReached === true) dog.drawBush();
 
   let targetedDucks = [];
   if (gameStarted) {
@@ -269,7 +268,7 @@ canvas.addEventListener("click", (event) => {
   hasShot = true;
 
   startShotCooldownCounter();
-  var duckshuted = false;
+  let duckshuted = false;
   for (let i = ducks.length - 1; i >= 0; i--) {
     if (isDuckClicked(x, y, ducks[i])) {
       twoWithOne += 1;

@@ -5,22 +5,26 @@ import {
   deadDucks,
   startGame,
   gameStarted,
+  dog,
 } from "./script.js";
 
 export class Dog {
   constructor(x, y, speed, spriteSheet) {
+    this.lastFrameTime = Date.now();
     this.spriteSheet = spriteSheet;
     this.spriteWidth = 69;
     this.spriteHeight = 69;
     this.dogLocation = canvas.height * 0.15;
+    this.bushLocationY = canvas.width / 2;
+    this.bushlocationX = canvas.height * 0.05;
 
     this.x = x;
     this.y = y;
     this.dx = speed;
 
-    this.frameIndex = 0;
+    this.frameIndex = 1;
     this.frameCount = 5;
-    this.frameInterval = 10;
+    this.frameInterval = 15;
     this.frameCounter = 0;
     this.spriteSheetY = 0;
     this.laughFrames = 2;
@@ -35,8 +39,16 @@ export class Dog {
     this.maxIdleCycles = 2;
     this.visible = true;
 
+    this.bushFrames = 6;
+    this.bushFrameIndex = 0;
+    this.bushFrameInterval = 50;
+    this.bushFrameCounter = 0;
+
+    this.startBush = false;
+    this.bushReached = false;
     this.isWalking = false;
     this.walkDirection = "left";
+    this.dogNuuh = 0;
     this.captured = false;
     this.captured2 = false;
     this.showdog = "none";
@@ -51,6 +63,12 @@ export class Dog {
     this.dogLaugh.src = "./CANVASAPI_UI/doglaugh1.png";
     this.dogLaugh2 = new Image();
     this.dogLaugh2.src = "./CANVASAPI_UI/doglaugh2.png";
+    this.dogHunt = new Image();
+    this.dogHunt.src = "./CANVASAPI_UI/dogwalk.png";
+    this.dogJump = new Image();
+    this.dogJump.src = "./CANVASAPI_UI/dogjump1.png";
+    this.dogJump2 = new Image();
+    this.dogJump2.src = "./CANVASAPI_UI/dogjump2.png";
   }
 
   draw() {
@@ -71,7 +89,7 @@ export class Dog {
         this.spriteHeight * 4
       );
       context.restore();
-    } else {
+    } else if (this.dx > 0) {
       context.drawImage(
         this.spriteSheet,
         spriteSheetX,
@@ -83,6 +101,27 @@ export class Dog {
         this.spriteWidth * 4,
         this.spriteHeight * 4
       );
+    }
+  }
+
+  drawBush() {
+    let bushImage =
+      this.bushFrameIndex === 0
+        ? this.dogHunt
+        : this.bushFrameIndex === 1
+        ? this.dogJump
+        : this.dogJump2;
+    if (this.dx > 0) {
+      context.drawImage(bushImage, 0, 0, 69, 69, this.x, this.y, 230, 230);
+    } else if (this.dx < 0) {
+      context.save();
+      context.scale(-1, 1);
+      context.drawImage(bushImage, 0, 0, 69, 69, this.x, this.y, 230, 230);
+    }
+    const now = Date.now();
+    if (now - this.lastFrameTime >= 1500) {
+      this.lastFrameTime = now;
+      this.bushFrameIndex = (this.bushFrameIndex + 1) % this.bushFrames;
     }
   }
 
@@ -131,6 +170,7 @@ export class Dog {
     if (this.frameCounter >= this.frameInterval) {
       this.frameCounter = 0;
       this.frameIndex = (this.frameIndex + 1) % this.frameCount;
+      if (this.frameIndex === 0) this.frameIndex = 1;
     }
     this.draw();
   }
@@ -237,31 +277,68 @@ export class Dog {
   updateWalking() {
     if (!this.isWalking) return;
 
-    this.x += this.dx;
+    if (this.frameIndex !== 0 && this.frameIndex !== 1 && this.startBush)
+      this.x += this.dx;
+    else if (!this.startBush) this.x += this.dx;
 
     const leftBoundary = canvas.width * 0.05; // 5% of canvas width
     const rightBoundary = canvas.width * 0.85; // 85% of canvas width
 
     if (this.x <= leftBoundary) {
-      this.isWalking = false;
+      this.isWalking = true;
       this.x = leftBoundary;
-      if (this.dx < 0) {
-        startGame();
-        console.log("Game started");
-      }
+      this.dx *= -1;
+      this.startBush = true;
+      console.log("Boundary reached");
     } else if (this.x >= rightBoundary) {
-      this.isWalking = false;
+      this.isWalking = true;
       this.x = rightBoundary;
-      if (this.dx > 0) {
-        startGame();
+      this.dx *= -1;
+      this.startBush = true;
+      console.log("Boundary reached");
+    }
+
+    // Compute the dog's center x-coordinate.
+    const dogCenterX = this.x + (this.spriteWidth * 4) / 2;
+
+    // Compute the canvas center.
+    const canvasCenterX = canvas.width / 2;
+
+    // Define a threshold as a percentage of the canvas width (e.g., 5%).
+    const threshold = canvas.width * 0.05;
+
+    if (this.startBush === true) {
+      if (Math.abs(dogCenterX - canvasCenterX) < threshold) {
+        console.log("Dog reached center");
+        this.startBush = false;
+        this.isWalking = false;
+        this.bushReached = true;
+      }
+      this.frameCounter++;
+      if (this.frameCounter >= this.frameInterval) {
+        this.frameCounter = 0;
+        this.frameIndex = (this.frameIndex + 1) % this.frameCount;
+        if (this.frameIndex === 2 && this.dogNuuh > 0) {
+          this.frameIndex = 0;
+          this.dogNuuh -= 1;
+        }
+        if (this.frameIndex === 4) {
+          this.dogNuuh += 1;
+        }
+      }
+    } else {
+      this.frameCounter++;
+      if (this.frameCounter >= this.frameInterval) {
+        this.frameCounter = 0;
+        this.frameIndex = (this.frameIndex + 1) % this.frameCount;
+        if (this.frameIndex === 0) this.frameIndex = 1;
       }
     }
 
-    this.frameCounter++;
-    if (this.frameCounter >= this.frameInterval) {
-      this.frameCounter = 0;
-      this.frameIndex = (this.frameIndex + 1) % this.frameCount;
-    }
     this.draw();
+  }
+
+  triggerBush() {
+    startGame();
   }
 }
