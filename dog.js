@@ -39,8 +39,8 @@ export class Dog {
     this.maxIdleCycles = 2;
     this.visible = true;
 
-    this.bushFrames = 6;
-    this.bushFrameIndex = 0;
+    this.bushFrames = 3;
+    this.bushFrameIndex = 2;
     this.bushFrameInterval = 50;
     this.bushFrameCounter = 0;
 
@@ -105,23 +105,26 @@ export class Dog {
   }
 
   drawBush() {
-    let bushImage =
-      this.bushFrameIndex === 0
-        ? this.dogHunt
-        : this.bushFrameIndex === 1
-        ? this.dogJump
-        : this.dogJump2;
+    let bushImages = [this.dogHunt, this.dogJump, this.dogJump2];
+    let bushImage = bushImages[this.bushFrameIndex];
+
+    let drawX = this.bushX;
+    let drawY = this.bushY;
+
     if (this.dx > 0) {
-      context.drawImage(bushImage, 0, 0, 69, 69, this.x, this.y, 230, 230);
+      context.drawImage(bushImage, 0, 0, 69, 69, drawX, drawY, 230, 230);
     } else if (this.dx < 0) {
-      context.save();
-      context.scale(-1, 1);
-      context.drawImage(bushImage, 0, 0, 69, 69, this.x, this.y, 230, 230);
+      context.drawImage(bushImage, 0, 0, 69, 69, drawX, drawY, 230, 230);
     }
     const now = Date.now();
-    if (now - this.lastFrameTime >= 1500) {
+    if (now - this.lastFrameTime >= 1000 && this.frameIndex === 2) {
       this.lastFrameTime = now;
-      this.bushFrameIndex = (this.bushFrameIndex + 1) % this.bushFrames;
+
+      this.bushFrameIndex = (this.bushFrameIndex + 1) % 3;
+    } else if (now - this.lastFrameTime >= 500 && this.frameIndex !== 2) {
+      this.lastFrameTime = now;
+
+      this.bushFrameIndex = (this.bushFrameIndex + 1) % 3;
     }
   }
 
@@ -310,6 +313,10 @@ export class Dog {
     if (this.startBush === true) {
       if (Math.abs(dogCenterX - canvasCenterX) < threshold) {
         console.log("Dog reached center");
+
+        this.bushX = this.x;
+        this.bushY = this.y;
+
         this.startBush = false;
         this.isWalking = false;
         this.bushReached = true;
