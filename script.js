@@ -50,6 +50,12 @@ dogIdle.src = "./CANVASAPI_UI/dogidle.png";
 const bulletImage = new Image();
 bulletImage.src = "./CANVASAPI_UI/bullet.png";
 
+const quack1 = new Audio("./CANVASAPI_UI/Quack2.m4a");
+const quack2 = new Audio("./CANVASAPI_UI/Quack4000.m4a");
+const quack3 = new Audio("./CANVASAPI_UI/Quack3.m4a");
+
+const quackSounds = [quack1, quack2, quack3];
+
 let bullets = 9;
 let bulletText = "Amount of bullets: " + bullets;
 
@@ -102,6 +108,7 @@ window.onload = () => {
 };
 
 export function startGame() {
+  levelStarted = false;
   gameStarted = true;
   startDuckSpawnCounter();
 }
@@ -162,12 +169,30 @@ function duckSpawn() {
   }
 }
 
+function playRandomQuack() {
+  if (isPaused) return;
+  let randomValue = Math.random() * 100;
+  let selectedQuack;
+
+  if (randomValue < 1) {
+    selectedQuack = quack3;
+  } else if (randomValue < 50) {
+    selectedQuack = quack2;
+  } else {
+    selectedQuack = quack1;
+  }
+  if (ducksAlive > 0) selectedQuack.play();
+}
+
+setInterval(playRandomQuack, 2000);
+
 let animateFrame = function () {
   if (isPaused) return;
 
   requestAnimationFrame(animateFrame);
   context.imageSmoothingEnabled = false;
   context.clearRect(0, 0, canvasWidth, canvasHeight);
+  context.globalCompositeOperation = "source-over";
 
   context.drawImage(background2, 0, 0, canvasWidth, canvasHeight);
   if (ducksAlive > 0) {
@@ -185,7 +210,7 @@ let animateFrame = function () {
   }
 
   context.drawImage(background, 0, 110, canvasWidth, canvasHeight);
-  context.font = "38px Arial";
+  context.font = "2.375rem Arial"; /* 38px */
   context.fillStyle = "White";
   context.textAlign = "right";
   context.fillText(scoreCount, canvasWidth - 20, 40);

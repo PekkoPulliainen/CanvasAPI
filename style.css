@@ -9,7 +9,7 @@ html {
 }
 
 p {
-  font: bold 18px monospace;
+  font: bold 1.125rem monospace; /* 18px */
 }
 
 #gameCanvas {
@@ -19,45 +19,7 @@ p {
   outline: 1px solid black;
 }
 
-#startGameDiv {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: #e4e4e4;
-  text-align: center;
-  font: 20px monospace;
-  color: #7c0800;
-  padding: 10px 50px 40px 50px;
-  border: 3px solid #005000;
-  border-radius: 3px;
-}
-
-#startGameButton {
-  background: #80d010;
-  color: #7c0800;
-  font: bold 14px monospace;
-  width: 100%;
-  padding: 5px;
-  border: none;
-  border-radius: 2px;
-  box-shadow: 5px 5px 0 #005000;
-  cursor: pointer;
-}
-
-#startGameButton:hover {
-  background: #80d010;
-  color: #7c0800;
-  font: bold 14px monospace;
-  width: 100%;
-  padding: 5px;
-  border: none;
-  border-radius: 2px;
-  box-shadow: 5px 5px 0 #005000;
-  cursor: pointer;
-  transform: scale(1.05);
-}
-
+#startGameDiv,
 #gameOverDiv {
   position: fixed;
   top: 50%;
@@ -65,45 +27,59 @@ p {
   transform: translate(-50%, -50%);
   background: #e4e4e4;
   text-align: center;
-  font: 15px monospace;
+  font: 1.25rem monospace; /* 20px */
   color: #7c0800;
-  padding: 10px 50px 40px 50px;
+  padding: 1rem 3.125rem 2.5rem 3.125rem; /* 10px 50px 40px 50px */
   border: 3px solid #005000;
   border-radius: 3px;
 }
 
-#finalScore, #Score {
-  font-size: 50px;
+#startGameButton,
+#restartButton {
+  background: #80d010;
+  color: #7c0800;
+  font: bold 0.875rem monospace; /* 14px */
+  width: 100%;
+  padding: 0.3125rem; /* 5px */
+  border: none;
+  border-radius: 2px;
+  box-shadow: 0.3125rem 0.3125rem 0 #005000; /* 5px 5px 0 */
+  cursor: pointer;
+}
+
+#startGameButton:hover,
+#restartButton:hover {
+  transform: scale(1.05);
+}
+
+#finalScore {
+  font-size: 3.125rem; /* 50px */
   margin-bottom: 0;
 }
 
 #finalScoreLabel {
-  font-size: 120px;
+  font-size: 7.5rem; /* 120px */
   margin-top: 0;
-  margin-bottom: 50px;
+  margin-bottom: 3.125rem; /* 50px */
 }
 
-#restartButton {
-  background: #80d010;
-  color: #7c0800;
-  font: bold 14px monospace;
-  width: 100%;
-  padding: 5px;
-  border: none;
-  border-radius: 2px;
-  box-shadow: 5px 5px 0 #005000;
-  cursor: pointer;
-}
+@media (max-width: 768px) {
+  #startGameDiv,
+  #gameOverDiv {
+    font-size: 1rem; /* 16px */
+    padding: 0.625rem 1.875rem 1.25rem 1.875rem; /* 10px 30px 20px 30px */
+  }
 
-#restartButton:hover {
-  background: #80d010;
-  color: #7c0800;
-  font: bold 14px monospace;
-  width: 100%;
-  padding: 5px;
-  border: none;
-  border-radius: 2px;
-  box-shadow: 5px 5px 0 #005000;
-  cursor: pointer;
-  transform: scale(1.05);
+  #startGameButton,
+  #restartButton {
+    font-size: 0.75rem; /* 12px */
+  }
+
+  #finalScore {
+    font-size: 2.5rem; /* 40px */
+  }
+
+  #finalScoreLabel {
+    font-size: 5rem; /* 80px */
+  }
 }

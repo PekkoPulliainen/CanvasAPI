@@ -147,7 +147,6 @@ export class Duck {
     } else {
       this.speed = 7 + Math.random() * 4;
     }
-    console.log("Diagonal? " + this.diagonal + " new speed: " + this.speed);
   }
 
   updateDeads() {

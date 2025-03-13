@@ -6,6 +6,7 @@ import {
   startGame,
   gameStarted,
   dog,
+  levelStarted,
 } from "./script.js";
 
 export class Dog {
@@ -20,7 +21,7 @@ export class Dog {
 
     this.x = x;
     this.y = y;
-    this.dx = speed;
+    this.dx = speed + 1;
 
     this.frameIndex = 1;
     this.frameCount = 5;
@@ -40,9 +41,13 @@ export class Dog {
     this.visible = true;
 
     this.bushFrames = 3;
-    this.bushFrameIndex = 2;
+    this.bushFrameIndex = 0;
     this.bushFrameInterval = 50;
     this.bushFrameCounter = 0;
+    this.jumpStart = false;
+    this.dogFlip = false;
+
+    this.dogBark = new Audio("./CANVASAPI_UI/Bark.mp3");
 
     this.startBush = false;
     this.bushReached = false;
@@ -108,23 +113,71 @@ export class Dog {
     let bushImages = [this.dogHunt, this.dogJump, this.dogJump2];
     let bushImage = bushImages[this.bushFrameIndex];
 
+    // Set bush position once when the dog starts the bush animation
+    if (!this.bushStartTime) {
+      this.bushX = this.x; // Save the current position
+      this.bushY = this.y;
+      this.bushStartTime = Date.now();
+      this.lastFrameTime = this.bushStartTime;
+    }
+
     let drawX = this.bushX;
     let drawY = this.bushY;
 
-    if (this.dx > 0) {
-      context.drawImage(bushImage, 0, 0, 69, 69, drawX, drawY, 230, 230);
-    } else if (this.dx < 0) {
-      context.drawImage(bushImage, 0, 0, 69, 69, drawX, drawY, 230, 230);
+    context.save();
+
+    // If moving left, flip the dog horizontally
+    if (this.dx < 0) {
+      context.translate(drawX + 250, drawY);
+      context.scale(-1, 1); // Flip the dog
     }
+
+    // Adjust the Y offset based on the current frame
+    let offsetY = this.bushFrameIndex === 0 ? 60 : -140;
+    let offsetX = this.dx < 0 ? 60 : 0;
+
+    // Draw the bush animation
+    if (this.dogFlip === false) {
+      context.drawImage(bushImage, 0, 0, 69, 69, offsetX, offsetY, 250, 250);
+    } else if (this.dogFlip === true && this.bushFrameIndex === 0) {
+      context.drawImage(
+        bushImage,
+        0,
+        0,
+        69,
+        69,
+        drawX + 60,
+        drawY + 60,
+        250,
+        250
+      );
+    } else
+      context.drawImage(
+        bushImage,
+        0,
+        0,
+        69,
+        69,
+        drawX + 60,
+        drawY - 140,
+        250,
+        250
+      );
+
+    context.restore();
+
+    // Handle timing of the bush animation frames
     const now = Date.now();
-    if (now - this.lastFrameTime >= 1000 && this.frameIndex === 2) {
-      this.lastFrameTime = now;
+    const frameDurations = [1000, 300, 300]; // frame durations for the bush animation
 
-      this.bushFrameIndex = (this.bushFrameIndex + 1) % 3;
-    } else if (now - this.lastFrameTime >= 500 && this.frameIndex !== 2) {
+    if (now - this.lastFrameTime >= frameDurations[this.bushFrameIndex]) {
       this.lastFrameTime = now;
+      this.bushFrameIndex = (this.bushFrameIndex + 1) % this.bushFrames;
 
-      this.bushFrameIndex = (this.bushFrameIndex + 1) % 3;
+      if (this.bushFrameIndex === 0) {
+        this.triggerBush(); // End of animation, trigger the bush event
+        this.dogBark.play();
+      }
     }
   }
 
@@ -285,9 +338,10 @@ export class Dog {
     else if (!this.startBush) this.x += this.dx;
 
     const leftBoundary = canvas.width * 0.05; // 5% of canvas width
-    const rightBoundary = canvas.width * 0.85; // 85% of canvas width
+    const rightBoundary = canvas.width * 0.9; // 90% of canvas width
 
     if (this.x <= leftBoundary) {
+      this.dogFlip = true;
       this.isWalking = true;
       this.x = leftBoundary;
       this.dx *= -1;
@@ -308,7 +362,7 @@ export class Dog {
     const canvasCenterX = canvas.width / 2;
 
     // Define a threshold as a percentage of the canvas width (e.g., 5%).
-    const threshold = canvas.width * 0.05;
+    const threshold = canvas.width * 0.01;
 
     if (this.startBush === true) {
       if (Math.abs(dogCenterX - canvasCenterX) < threshold) {
@@ -346,6 +400,8 @@ export class Dog {
   }
 
   triggerBush() {
+    this.bushReached = false;
+    this.jumpStart = false;
     startGame();
   }
 }
