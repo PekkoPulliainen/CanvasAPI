@@ -26,6 +26,7 @@ export class Duck {
     this.frameCounter = 0;
     this.deadDelayCounter = 0;
     this.frameIndex = Math.floor(Math.random() * 4);
+    this.duckLanded = false;
 
     this.draw();
   }
@@ -150,14 +151,14 @@ export class Duck {
   }
 
   updateDeads() {
-    if (this.deadDelayCounter < 70) {
+    if (this.deadDelayCounter < 40) {
       this.deadDelayCounter++;
       this.drawDead(0);
     } else {
       this.drawDead(this.frameIndex);
       this.y += this.speed;
       this.frameCounter++;
-      if (this.frameCounter >= 10) {
+      if (this.frameCounter >= 7) {
         this.frameCounter = 0;
         this.frameIndex = 1 + (this.frameIndex % 4);
       }

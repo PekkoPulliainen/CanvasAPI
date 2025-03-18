@@ -21,7 +21,7 @@ export class Dog {
 
     this.x = x;
     this.y = y;
-    this.dx = speed + 1;
+    this.dx = speed + 3;
 
     this.frameIndex = 1;
     this.frameCount = 5;
@@ -249,18 +249,9 @@ export class Dog {
   } */
 
   updateshowdog() {
-    if (this.showdog === "none") return;
-    if (deadDucks.length > 0 && this.captured) return;
-    if (this.showdog === "plus") {
-      if (this.y > canvas.height * 0.75) {
-        this.y -= 1;
-      }
-      this.frameCounter++;
-    } else {
-      this.frameCounter--;
-      this.y += 1;
-    }
+    if (this.showdog === "none") return; // Don't show the dog if it's not needed
     if (this.captured)
+      // Draw the dog when it's captured
       context.drawImage(
         this.dogduck,
         0, // spriteSheetX
@@ -286,13 +277,26 @@ export class Dog {
       );
     else this.drawLaugh();
 
+    if (this.showdog === "plus") {
+      // Show the dog when it's needed
+      if (this.y > canvas.height * 0.7 + 60) {
+        // Move the dog up if it's too low
+        this.y -= 1; // Move the dog up
+      }
+      this.frameCounter++;
+    } else {
+      this.frameCounter--;
+      this.y += 1;
+    }
+
     if (this.frameCounter > 90) {
       this.showdog = "minus";
     }
-    if (this.frameCounter == 0) {
+    if (this.frameCounter === 0) {
       this.showdog = "none";
       this.captured = false;
       this.captured2 = false;
+      ducks.duckLanded = false;
     }
 
     if (this.isWalking) {
@@ -362,7 +366,7 @@ export class Dog {
     const canvasCenterX = canvas.width / 2;
 
     // Define a threshold as a percentage of the canvas width (e.g., 5%).
-    const threshold = canvas.width * 0.01;
+    const threshold = canvas.width * 0.06;
 
     if (this.startBush === true) {
       if (Math.abs(dogCenterX - canvasCenterX) < threshold) {

@@ -313,10 +313,6 @@ canvas.addEventListener("click", (event) => {
     }
   }
 
-  if (!duckshuted) {
-    dog.triggerLaugh();
-  }
-
   if (bullets === 0 && ducksAlive > 0) {
     document.getElementById("finalScore").textContent = scoreCount;
     document.getElementById("gameOverDiv").style.display = "block";
@@ -330,18 +326,54 @@ canvas.addEventListener("click", (event) => {
     bulletText = "Amount of bullets: " + bullets;
   }
 
-  if (!duckshuted && dog.showdog === "none") {
+  if (
+    !duckshuted &&
+    dog.showdog === "none" &&
+    !dog.isLaughing &&
+    !dog.captured &&
+    !dog.captured2
+  ) {
+    // Reset previous states
+    dog.captured = false;
+    dog.captured2 = false;
+    dog.isLaughing = false;
+
     dog.showdog = "plus";
-    dog.y = canvas.height * 0.71 + 60;
+
+    // Make sure Y is set correctly ONCE
+    if (dog.y === undefined || dog.y !== canvas.height * 0.7 + 120) {
+      dog.y = canvas.height * 0.7 + 120;
+    }
+
     dog.x = x;
     dog.frameIndex = 0;
     dog.frameCounter = 0;
+
+    dog.triggerLaugh();
   }
-  if (duckshuted && dog.showdog === "none") {
+
+  if (
+    duckshuted &&
+    dog.showdog === "none" &&
+    !dog.isLaughing &&
+    !dog.captured &&
+    !dog.captured2
+  ) {
+    // Reset previous states
+    dog.isLaughing = false;
+
     dog.showdog = "plus";
-    if (!doubleKill) dog.captured = true;
-    else dog.captured2 = true;
-    dog.y = canvas.height * 0.71 + 60;
+    if (!doubleKill) {
+      dog.captured = true;
+    } else {
+      dog.captured2 = true;
+    }
+
+    // Ensure Y stays correct
+    if (dog.y === undefined || dog.y !== canvas.height * 0.7 + 120) {
+      dog.y = canvas.height * 0.7 + 120;
+    }
+
     dog.x = x;
     dog.frameIndex = 0;
     dog.frameCounter = 0;
