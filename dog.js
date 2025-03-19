@@ -58,7 +58,7 @@ export class Dog {
     this.captured2 = false;
     this.showdog = "none";
     this.isLaughing = false;
-    this.laughDuration = 1500;
+    this.laughDuration = 2000;
     this.laughStartTime = 0;
     this.dogduck = new Image();
     this.dogduck.src = "./CANVASAPI_UI/dogduck1.png";
@@ -281,12 +281,12 @@ export class Dog {
       // Show the dog when it's needed
       if (this.y > canvas.height * 0.7 + 60) {
         // Move the dog up if it's too low
-        this.y -= 1; // Move the dog up
+        this.y -= 1.5; // Move the dog up
       }
       this.frameCounter++;
     } else {
       this.frameCounter--;
-      this.y += 1;
+      this.y += 2;
     }
 
     if (this.frameCounter > 90) {
@@ -296,7 +296,6 @@ export class Dog {
       this.showdog = "none";
       this.captured = false;
       this.captured2 = false;
-      ducks.duckLanded = false;
     }
 
     if (this.isWalking) {

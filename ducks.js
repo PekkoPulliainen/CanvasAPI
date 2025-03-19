@@ -144,21 +144,21 @@ export class Duck {
 
   changeSpeed() {
     if (this.diagonal) {
-      this.speed = 5 + Math.random() * 3;
+      this.speed = 7 + Math.random() * 3;
     } else {
-      this.speed = 7 + Math.random() * 4;
+      this.speed = 9 + Math.random() * 4;
     }
   }
 
   updateDeads() {
-    if (this.deadDelayCounter < 40) {
+    if (this.deadDelayCounter < 20) {
       this.deadDelayCounter++;
       this.drawDead(0);
     } else {
       this.drawDead(this.frameIndex);
       this.y += this.speed;
       this.frameCounter++;
-      if (this.frameCounter >= 7) {
+      if (this.frameCounter >= 5) {
         this.frameCounter = 0;
         this.frameIndex = 1 + (this.frameIndex % 4);
       }

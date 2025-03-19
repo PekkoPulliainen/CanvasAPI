@@ -1,6 +1,6 @@
 import { Duck } from "./ducks.js";
 import { Dog } from "./dog.js";
-import { DUCK_WIDTH, DUCK_HEIGHT } from "./constants.js";
+import { DUCK_WIDTH, DUCK_HEIGHT, leaderboardKey } from "./constants.js";
 
 export let lastMouseX;
 export let lastMouseY;
@@ -23,8 +23,15 @@ let DUCK_SPAWN_INTERVAL = 100;
 let DUCK_SPAWN_COUNTER = 0;
 let FLASH_DURATION = 10;
 
+let animationStartInterval = 100;
+let animationStartCounter = 0;
+
 let canvasWidth = window.innerWidth;
 let canvasHeight = window.innerHeight;
+
+let gameOver = false;
+
+//let playerName = document.getElementById("playerName")
 
 function resizeCanvas() {
   canvasWidth = window.innerWidth;
@@ -32,6 +39,44 @@ function resizeCanvas() {
   canvas.width = canvasWidth * window.devicePixelRatio;
   canvas.height = canvasHeight * window.devicePixelRatio;
   context.scale(window.devicePixelRatio, window.devicePixelRatio);
+}
+
+function getLeaderboard() {
+  return JSON.parse(localStorage.getItem(leaderboardKey)) || [];
+}
+
+function updateLeaderboard(playerName, score) {
+  let leaderboard = getLeaderboard();
+  leaderboard.push({ name: playerName, score: score });
+  leaderboard.sort((a, b) => b.score - a.score);
+  leaderboard = leaderboard.slice(0, 5); // Keep top 5 scores
+  localStorage.setItem(leaderboardKey, JSON.stringify(leaderboard));
+  renderLeaderboard();
+}
+
+function renderLeaderboard() {
+  const leaderboard = getLeaderboard();
+  const container = document.getElementById("leaderboardContainer");
+
+  if (!container) {
+    console.error("Leaderboard container not found!");
+    return; // Prevent the error
+  }
+
+  container.innerHTML = "<h3>Top 5 Players</h3>";
+  leaderboard.forEach((entry, index) => {
+    const row = document.createElement("div");
+    row.classList.add("leaderboard-row");
+    row.innerHTML = `<span class='rank'>${index + 1}.</span> 
+                       <span class='name'>${entry.name}</span> 
+                       <span class='score'>${entry.score}</span>`;
+    container.appendChild(row);
+  });
+}
+
+function handleGameOver() {
+  document.getElementById("finalScore").textContent = scoreCount;
+  document.getElementById("gameOverDiv").style.display = "block";
 }
 
 window.addEventListener("resize", resizeCanvas);
@@ -56,8 +101,10 @@ const quack3 = new Audio("./CANVASAPI_UI/Quack3.m4a");
 
 const quackSounds = [quack1, quack2, quack3];
 
-let bullets = 9;
+let bullets = 0;
 let bulletText = "Amount of bullets: " + bullets;
+
+let reloadText = "reloading...";
 
 const background2 = new Image();
 background2.src = "./CANVASAPI_UI/background-new-3.png";
@@ -84,6 +131,9 @@ bulletAudio.volume = 0.05;
 
 window.onload = () => {
   resizeCanvas();
+  //document.getElementById("gameOverDiv").style.display = "block";
+
+  renderLeaderboard();
 
   // Start Game -nappulan klikkaus
   document.getElementById("startGameButton").addEventListener("click", () => {
@@ -95,8 +145,10 @@ window.onload = () => {
 
   // Restart -nappulan klikkaus
   document.getElementById("restartButton").addEventListener("click", () => {
-    levelStarted = true;
-    document.getElementById("gameOverDiv").style.display = "none";
+    const playerName =
+      document.getElementById("playerNameInput").value.trim() || "Anonymous";
+    updateLeaderboard(playerName, scoreCount);
+    window.location.reload();
   });
 
   context.drawImage(background, 0, 0, window.innerWidth, window.innerHeight);
@@ -128,7 +180,7 @@ function startShotCooldownCounter() {
   SHOT_COOLDOWN_INTERVAL = setInterval(() => {
     if (isPaused) return;
     SHOT_COOLDOWN_COUNTER++;
-    if (SHOT_COOLDOWN_COUNTER === 25) {
+    if (SHOT_COOLDOWN_COUNTER === 20) {
       hasShot = false;
       clearInterval(SHOT_COOLDOWN_INTERVAL);
       SHOT_COOLDOWN_COUNTER = 0;
@@ -152,8 +204,8 @@ function startDuckSpawnCounter() {
 function duckSpawn() {
   resizeCanvas();
 
-  duckCount += 5;
-  bullets = duckCount + 2;
+  duckCount += 3;
+  bullets = Math.round(duckCount / 1.5) + 3;
   bulletText = "Amount of bullets: " + bullets;
 
   for (let i = 0; i < duckCount; i++) {
@@ -171,6 +223,8 @@ function duckSpawn() {
 
 function playRandomQuack() {
   if (isPaused) return;
+  if (gameOver) return;
+
   let randomValue = Math.random() * 100;
   let selectedQuack;
 
@@ -213,8 +267,14 @@ let animateFrame = function () {
   context.font = "2.375rem Arial"; /* 38px */
   context.fillStyle = "White";
   context.textAlign = "right";
-  context.fillText(scoreCount, canvasWidth - 20, 40);
-  context.fillText(bulletText, canvasWidth * 0.2, canvasHeight * 0.05);
+  context.fillText(
+    "Score: " + scoreCount,
+    canvasWidth * 0.8,
+    canvasHeight * 0.06
+  );
+  context.fillText(bulletText, canvasWidth * 0.22, canvasHeight * 0.06);
+  if (SHOT_COOLDOWN_COUNTER > 0)
+    context.fillText(reloadText, canvasWidth * 0.5, canvasHeight * 0.06);
 
   for (let i = 1; i <= bullets; i++) {
     context.drawImage(
@@ -310,15 +370,18 @@ canvas.addEventListener("click", (event) => {
     }
     if (twoWithOne > 1) {
       doubleKill = true;
+      scoreCount += 300;
     }
   }
 
   if (bullets === 0 && ducksAlive > 0) {
-    document.getElementById("finalScore").textContent = scoreCount;
-    document.getElementById("gameOverDiv").style.display = "block";
-    document.getElementById("restartButton").onclick = function () {
-      window.location.reload();
-    };
+    gameOver = true;
+    handleGameOver();
+    //document.getElementById("finalScore").textContent = scoreCount;
+    //document.getElementById("gameOverDiv").style.display = "block";
+    //document.getElementById("restartButton").onclick = function () {
+    //window.location.reload();
+    //};
   }
 
   if (ducksAlive === 0) {
@@ -341,8 +404,8 @@ canvas.addEventListener("click", (event) => {
     dog.showdog = "plus";
 
     // Make sure Y is set correctly ONCE
-    if (dog.y === undefined || dog.y !== canvas.height * 0.7 + 120) {
-      dog.y = canvas.height * 0.7 + 120;
+    if (dog.y === undefined || dog.y !== canvas.height * 0.9) {
+      dog.y = canvas.height * 0.9;
     }
 
     dog.x = x;
@@ -359,24 +422,28 @@ canvas.addEventListener("click", (event) => {
     !dog.captured &&
     !dog.captured2
   ) {
-    // Reset previous states
-    dog.isLaughing = false;
+    while (animationStartCounter < animationStartInterval)
+      animationStartCounter++;
+    if (animationStartCounter >= animationStartInterval) {
+      // Reset previous states
+      dog.isLaughing = false;
 
-    dog.showdog = "plus";
-    if (!doubleKill) {
-      dog.captured = true;
-    } else {
-      dog.captured2 = true;
+      dog.showdog = "plus";
+      if (!doubleKill) {
+        dog.captured = true;
+      } else {
+        dog.captured2 = true;
+      }
+
+      // Ensure Y stays correct
+      if (dog.y === undefined || dog.y !== canvas.height * 0.9) {
+        dog.y = canvas.height * 0.9;
+      }
+
+      dog.x = x;
+      dog.frameIndex = 0;
+      dog.frameCounter = 0;
     }
-
-    // Ensure Y stays correct
-    if (dog.y === undefined || dog.y !== canvas.height * 0.7 + 120) {
-      dog.y = canvas.height * 0.7 + 120;
-    }
-
-    dog.x = x;
-    dog.frameIndex = 0;
-    dog.frameCounter = 0;
   }
 });
 

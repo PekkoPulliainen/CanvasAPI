@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1.0 user-scalable=no"
+      content="width=device-width, initial-scale=0.8 user-scalable=no"
     />
     <title>Duck Hunt Game</title>
     <link rel="stylesheet" href="style.css" />
@@ -13,8 +13,8 @@
   </head>
   <body>
     <div id="startGameDiv" style="display: block">
-      <p>Welcome to</p>
-      <h1>Duck Hunt</h1>
+      <p>Hei Kasiluokkalaiset</p>
+      <h1>Kokeilkaa DuckHuntia</h1>
       <button id="startGameButton">Start Game</button>
     </div>
 
@@ -22,7 +22,24 @@
       <p>Game Over!</p>
       <h1 id="finalScore">0</h1>
       <p id="finalScoreLabel">Points</p>
+      <input type="text" id="playerNameInput" placeholder="Enter your name" />
       <button id="restartButton">Restart</button>
+    </div>
+
+    <!-- Leaderboard Container -->
+    <div
+      id="leaderboardContainer"
+      style="
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: white;
+        padding: 10px;
+        border-radius: 5px;
+      "
+    >
+      <h3>Leaderboard</h3>
+      <div id="leaderboardContent"></div>
     </div>
 
     <canvas id="gameCanvas"></canvas>
