@@ -206,6 +206,9 @@ function duckSpawn() {
 
   duckCount += 3;
   bullets = Math.round(duckCount / 1.5) + 3;
+  if (duckCount > 20) {
+    bullets = Math.round(bullets / 1.3);
+  }
   bulletText = "Amount of bullets: " + bullets;
 
   for (let i = 0; i < duckCount; i++) {
@@ -345,9 +348,15 @@ canvas.addEventListener("click", (event) => {
   let twoWithOne = 0;
 
   console.log("Shot at: ", x, y);
-
-  bullets -= 1;
-  bulletText = "Amount of bullets: " + bullets;
+  let newBullet = Math.round(Math.random() * 10);
+  console.log("new bullet? " + newBullet);
+  if (newBullet === 1) {
+    let bullets2 = bullets - 1;
+    bulletText = "Amount of bullets: " + bullets2 + " + 1";
+  } else {
+    bullets -= 1;
+    bulletText = "Amount of bullets: " + bullets;
+  }
 
   console.log(bullets);
   hasShot = true;
